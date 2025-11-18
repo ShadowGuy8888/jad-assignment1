@@ -7,17 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <%@ include file="designScripts.jsp" %>
-    
-    <style>
-        body {
-            background-color: #F9FAFB;
-            min-height: 100vh;
-        }
-        .main-content {
-            min-height: calc(100vh - 80px);
-        }
-    </style>
 </head>
+<% if (session.getAttribute("username") != null) response.sendRedirect("logout.jsp"); %>
 <body>
 	<%@ include file="header.jsp" %>
 
@@ -27,37 +18,42 @@
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                     <div class="text-center mb-4">
                         <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 mb-3" style="width: 80px; height: 80px;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                <polyline points="10 17 15 12 10 7"></polyline>
-                                <line x1="15" y1="12" x2="3" y2="12"></line>
-                            </svg>
+                            <i class="fa-solid fa-right-to-bracket fa-2x text-primary"></i>
                         </div>
                         <h1 class="display-6 fw-bold mb-2">Welcome Back</h1>
                         <p class="text-secondary">Login to access your account and manage your care services</p>
                     </div>
 
                     <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-md-5">
                             <h2 class="h4 fw-bold mb-2">Login</h2>
                             <p class="text-secondary mb-4">Enter your credentials to access your account</p>
                             
-                            <form id="loginForm">
+						<% 
+						    String errMsg = (String) request.getAttribute("error");
+						    if (errMsg != null) {
+						%>
+						    	<small class="text-danger"><%= errMsg %></small>
+						<%
+						    }
+						%>
+                            
+                            <form action="/JAD-Assignment1/login" method="POST">
                                 <div class="mb-3">
-                                    <label for="emailInput" class="form-label fw-semibold">Email Address</label>
-                                    <input type="email" class="form-control bg-light" id="emailInput" placeholder="your@email.com">
+                                    <label for="usernameInput" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="usernameInput" name="usernameInput" placeholder="yourUsername">
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="passwordInput" class="form-label fw-semibold">Password</label>
-                                    <input type="password" class="form-control bg-light" id="passwordInput" placeholder="Enter your password">
+                                    <label for="passwordInput" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="passwordInput" name="passwordInput" placeholder="yourPassword">
                                 </div>
                                 
                                 <button type="submit" class="btn btn-dark w-100 fw-semibold py-2">Login</button>
                             </form>
                             
                             <p class="text-center text-secondary mt-4 mb-4">
-                                Don't have an account? <a href="#" class="text-primary text-decoration-none fw-medium">Register here</a>
+                                Don't have an account? <a href="register.jsp" class="text-primary text-decoration-none">Register here</a>
                             </p>
                         </div>
                     </div>
