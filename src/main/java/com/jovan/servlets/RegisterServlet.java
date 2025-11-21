@@ -40,43 +40,49 @@ public class RegisterServlet extends HttpServlet {
         }
         
         Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        CallableStatement cs = null;
 
         try {
         	Class.forName("com.mysql.cj.jdbc.Driver");
         	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
-			ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?");
+			cs = conn.prepareCall("{ CALL register_user(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
         	
-            ps.setString(1, username);
-            rs = ps.executeQuery();
+		    cs.setString(1, username);
+		    cs.setString(2, BCrypt.hashpw(password, BCrypt.gensalt(10)));
+		    cs.setString(3, email);
+		    cs.setString(4, firstName);
+		    cs.setString(5, lastName);
+		    cs.setString(6, phone);
+		    cs.setString(7, address);
+		    cs.setString(8, emergencyPhone);
+		    cs.setString(9, blkNo);
+		    cs.setString(10, unitNo);
+		    
+		    cs.registerOutParameter(11, Types.INTEGER); // p_id
+		    cs.registerOutParameter(12, Types.VARCHAR); // p_role
+		    cs.registerOutParameter(13, Types.BOOLEAN); // p_success
+		    cs.registerOutParameter(14, Types.VARCHAR); // p_message
+		    
+		    cs.execute();
+		    
+		    String userId = cs.getString(11);
+		    String userRole = cs.getString(12);
+		    boolean success = cs.getBoolean(13);
+		    String message = cs.getString(14);
 
-            if (rs.next()) {
-                req.setAttribute("error", "Username already exists!");
-                req.getRequestDispatcher("register.jsp").forward(req, res);
-                return;
-            }
-            
-            PreparedStatement ps1 = conn.prepareStatement("INSERT INTO user (username, password, email, first_name, last_name, phone, address, emergency_contact, blk_no, unit_no) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-            ps1.setString(1, username);
-            ps1.setString(2, BCrypt.hashpw(password, BCrypt.gensalt(10))); // bcrypt hashing
-            ps1.setString(3, email);
-            ps1.setString(4, firstName);
-            ps1.setString(5, lastName);
-            ps1.setString(6, phone);
-            ps1.setString(7, address);
-            ps1.setString(8, emergencyPhone);
-            ps1.setString(9, blkNo);
-            ps1.setString(10, unitNo);
-            ps1.executeUpdate();
-
-            // Start session
-            HttpSession session = req.getSession();
-            session.setAttribute("username", username);
-            session.setAttribute("loginTimestamp", new Date());
-
-            res.sendRedirect("index.jsp");
+		    if (success) {
+	            // Start session
+	            HttpSession session = req.getSession();
+	            session.setAttribute("userId", userId);
+	            session.setAttribute("username", username);
+	            session.setAttribute("userRole", userRole);
+	            session.setAttribute("loginTimestamp", new Date());
+	            res.sendRedirect("index.jsp");
+		    
+		    } else { // error registering
+		        req.setAttribute("error", message);
+		        req.getRequestDispatcher("register.jsp").forward(req, res);
+		    }
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -84,8 +90,7 @@ public class RegisterServlet extends HttpServlet {
             req.getRequestDispatcher("register.jsp").forward(req, res);
         
         } finally {
-        	try { if (rs != null) rs.close(); } catch (SQLException e) {}
-        	try { if (ps != null) ps.close(); } catch (SQLException e) {}
+        	try { if (cs != null) cs.close(); } catch (SQLException e) {}
         	try { if (conn != null) conn.close(); } catch (SQLException e) {}
         }
         

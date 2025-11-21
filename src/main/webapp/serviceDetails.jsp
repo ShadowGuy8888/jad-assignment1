@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,29 @@
         }
     </style>
 </head>
+<%
+	Class.forName("com.mysql.cj.jdbc.Driver");
+	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+	
+	String serviceId = request.getParameter("serviceId");
+	PreparedStatement ps = conn.prepareStatement(
+        "SELECT " +
+        "    s.id, " +
+        "    s.name service_name, " +
+        "    s.description, " +
+        "    s.hourly_rate, " +
+        "    s.image_url, " +
+        "    sc.name service_category_name, " +
+        "    GROUP_CONCAT(cq.name SEPARATOR \"||\") qualifications " +
+        "FROM service s " +
+        "JOIN service_category sc ON s.category_id = sc.id " +
+        "LEFT JOIN service_caregiver_qualification scq ON s.id = scq.service_id " +
+        "LEFT JOIN caregiver_qualification cq ON scq.caregiver_qualification_id = cq.qualification_id " +
+        "WHERE s.id = ?;"
+	);
+	ps.setString(1, serviceId);
+	ResultSet rs = ps.executeQuery();
+%>
 <body>
 	<%@ include file="header.jsp" %>
 
@@ -20,155 +44,138 @@
         <!-- Breadcrumb Section -->
         <section class="bg-light py-3 border-bottom">
             <div class="container">
-                <button class="btn btn-link text-decoration-none p-0 text-dark">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
-                        <path d="m12 19-7-7 7-7"></path>
-                        <path d="M19 12H5"></path>
-                    </svg>
+                <button onclick="location.href = 'services.jsp'" class="btn btn-link text-decoration-none p-0 text-dark">
+                    <i class="bi bi-arrow-left"></i>
                     Back to Services
                 </button>
             </div>
         </section>
 
-        <!-- Service Detail Section -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row g-4">
-                    <!-- Left Column - Service Details -->
-                    <div class="col-lg-8">
-                        <!-- Service Header -->
-                        <div class="mb-4">
-                            <span class="badge bg-primary mb-2">In-Home Care</span>
-                            <h1 class="mb-3">Personal Care Assistance</h1>
-                            <div class="d-flex flex-wrap gap-4 text-secondary">
-                                <div class="d-flex align-items-center gap-2">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
-                                        <line x1="12" x2="12" y1="2" y2="22"></line>
-                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                                    </svg>
-                                    <span class="text-success fw-semibold">$35 per hour</span>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M12 6v6l4 2"></path>
-                                    </svg>
-                                    <span>Flexible scheduling</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Service Description Card -->
-                        <div class="card border mb-4">
-                            <div class="card-header bg-white">
-                                <h4 class="mb-0 h5">Service Description</h4>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-secondary mb-0">Our trained caregivers provide compassionate assistance with personal care activities to help maintain dignity and independence. Services include bathing, dressing, grooming, toileting, and mobility assistance.</p>
-                            </div>
-                        </div>
-
-                        <!-- Qualifications Card -->
-                        <div class="card border">
-                            <div class="card-header bg-white">
-                                <h4 class="mb-0 h5 d-flex align-items-center gap-2">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path>
-                                        <circle cx="12" cy="8" r="6"></circle>
-                                    </svg>
-                                    Caregiver Qualifications
-                                </h4>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled mb-0">
-                                    <li class="d-flex align-items-start gap-2 mb-3">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" class="flex-shrink-0" style="margin-top: 2px;">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <path d="m9 12 2 2 4-4"></path>
-                                        </svg>
-                                        <span>Certified Nursing Assistant (CNA)</span>
-                                    </li>
-                                    <li class="d-flex align-items-start gap-2 mb-3">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" class="flex-shrink-0" style="margin-top: 2px;">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <path d="m9 12 2 2 4-4"></path>
-                                        </svg>
-                                        <span>First Aid Certified</span>
-                                    </li>
-                                    <li class="d-flex align-items-start gap-2 mb-0">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2" class="flex-shrink-0" style="margin-top: 2px;">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <path d="m9 12 2 2 4-4"></path>
-                                        </svg>
-                                        <span>Background Checked</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column - Booking Form -->
-                    <div class="col-lg-4">
-                        <div class="card border sticky-booking">
-                            <div class="card-header bg-white">
-                                <h4 class="mb-0 h5">Book This Service</h4>
-                            </div>
-                            <div class="card-body">
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="quantity" class="form-label fw-semibold small">Number of Sessions/Hours</label>
-                                        <input type="number" class="form-control" id="quantity" min="1" value="1">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="date" class="form-label fw-semibold small">Preferred Date *</label>
-                                        <div class="position-relative">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="position-absolute top-50 translate-middle-y ms-3" style="pointer-events: none;">
-                                                <path d="M8 2v4"></path>
-                                                <path d="M16 2v4"></path>
-                                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                                                <path d="M3 10h18"></path>
-                                            </svg>
-                                            <input type="date" class="form-control ps-5" id="date" min="2025-11-13">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="time" class="form-label fw-semibold small">Preferred Time</label>
-                                        <input type="time" class="form-control" id="time">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="caregiver" class="form-label fw-semibold small">Caregiver Preference (Optional)</label>
-                                        <input type="text" class="form-control" id="caregiver" placeholder="Request specific caregiver">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="requests" class="form-label fw-semibold small">Special Requests or Care Needs</label>
-                                        <textarea class="form-control" id="requests" rows="4" placeholder="Describe any specific needs or requests..."></textarea>
-                                    </div>
-
-                                    <div class="border-top pt-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span>Total:</span>
-                                            <span class="fs-3 text-success fw-semibold">$35.00</span>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="8" cy="21" r="1"></circle>
-                                                <circle cx="19" cy="21" r="1"></circle>
-                                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                                            </svg>
-                                            Add to Booking Cart
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+	<%
+		if (rs.next()) {
+	%>
+	        <!-- Service Detail Section -->
+	        <section class="py-5">
+	            <div class="container">
+	                <div class="row g-4">
+	                    <!-- Left Column - Service Details -->
+	                    <div class="col-lg-8">
+	                        <!-- Service Header -->
+	                        <div class="mb-4">
+	                            <span class="badge bg-primary mb-2"><%= rs.getString("service_category_name") %></span>
+	                            <h1 class="mb-3"><%= rs.getString("service_name") %></h1>
+	                            <div class="d-flex flex-wrap gap-4 text-secondary">
+	                                <div class="d-flex align-items-center gap-2">
+	                                    <i class="fa-solid fa-dollar-sign text-success"></i>
+	                                    <span class="text-success fw-semibold"><%= rs.getString("hourly_rate") %> per hour</span>
+	                                </div>
+	                                <div class="d-flex align-items-center gap-2">
+	                                    <i class="bi bi-clock"></i>
+	                                    <span>Flexible scheduling</span>
+	                                </div>
+	                            </div>
+	                        </div>
+	
+	                        <!-- Service Description Card -->
+	                        <div class="card border mb-4">
+	                            <div class="card-header bg-white">
+	                                <h4 class="mb-0 h5">Service Description</h4>
+	                            </div>
+	                            <div class="card-body">
+	                                <p class="text-secondary mb-0"><%= rs.getString("description") %></p>
+	                            </div>
+	                        </div>
+	
+	                        <!-- Qualifications Card -->
+	                        <div class="card border">
+	                            <div class="card-header bg-white">
+	                                <h4 class="mb-0 h5 d-flex align-items-center gap-2">
+	                                    <i class="fa-solid fa-medal"></i>
+	                                    Caregiver Qualifications
+	                                </h4>
+	                            </div>
+	                            <div class="card-body">
+	                                <ul class="list-unstyled mb-0">
+                                    <%
+                                    	for (String qualification : rs.getString("qualifications").split("\\|\\|")) {
+                                    %>
+		                                    <li class="d-flex align-items-start gap-2 mb-3">
+	                            				<i class="bi bi-check2-circle text-success"></i>
+		                                        <span><%= qualification %></span>
+		                                    </li>
+	                                <%
+                                    	}
+	                                %>
+	                                </ul>
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <!-- Right Column - Booking Form -->
+	                    <div class="col-lg-4">
+	                        <div class="card border sticky-booking">
+	                            <div class="card-header bg-white">
+	                                <h4 class="mb-0 h5">Book This Service</h4>
+	                            </div>
+	                            <div class="card-body">
+	                                <form>
+	                                    <div class="mb-3">
+	                                        <label for="quantity" class="form-label fw-semibold small">Number of Sessions/Hours</label>
+	                                        <input type="number" class="form-control" id="quantity" min="1" value="1">
+	                                    </div>
+	
+	                                    <div class="mb-3">
+	                                        <label for="date" class="form-label fw-semibold small">Preferred Date *</label>
+	                                        <div class="position-relative">
+	                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="position-absolute top-50 translate-middle-y ms-3" style="pointer-events: none;">
+	                                                <path d="M8 2v4"></path>
+	                                                <path d="M16 2v4"></path>
+	                                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+	                                                <path d="M3 10h18"></path>
+	                                            </svg>
+	                                            <input type="date" class="form-control ps-5" id="date" min="2025-11-13">
+	                                        </div>
+	                                    </div>
+	
+	                                    <div class="mb-3">
+	                                        <label for="time" class="form-label fw-semibold small">Preferred Time</label>
+	                                        <input type="time" class="form-control" id="time">
+	                                    </div>
+	
+	                                    <div class="mb-3">
+	                                        <label for="caregiver" class="form-label fw-semibold small">Caregiver Preference (Optional)</label>
+	                                        <input type="text" class="form-control" id="caregiver" placeholder="Request specific caregiver">
+	                                    </div>
+	
+	                                    <div class="mb-3">
+	                                        <label for="requests" class="form-label fw-semibold small">Special Requests or Care Needs</label>
+	                                        <textarea class="form-control" id="requests" rows="4" placeholder="Describe any specific needs or requests..."></textarea>
+	                                    </div>
+	
+	                                    <div class="border-top pt-3">
+	                                        <div class="d-flex justify-content-between align-items-center mb-3">
+	                                            <span>Total:</span>
+	                                            <span class="fs-3 text-success fw-semibold">$35.00</span>
+	                                        </div>
+	                                        <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+	                                            <i class="bi bi-cart2"></i>
+	                                            Add to Booking Cart
+	                                        </button>
+	                                    </div>
+	                                </form>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </section>
+    <%
+		} else {
+    %>
+    		<h1 class="text-danger">Service not found.</h1>
+    <%
+		}
+    %>
 
         <!-- Important Information Section -->
         <section class="py-5 bg-light">

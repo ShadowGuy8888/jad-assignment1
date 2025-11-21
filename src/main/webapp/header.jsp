@@ -13,8 +13,9 @@
             <div class="d-flex align-items-center gap-2">
 
             <% 
-                String username = (String) session.getAttribute("username");
-                if (username != null) { 
+                String userRole = (String) session.getAttribute("userRole");
+            	String username = (String) session.getAttribute("username");
+                if ("USER".equals(userRole)) {
             %>
 	                <!-- Profile dropdown -->
 	                <div class="dropdown">

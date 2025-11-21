@@ -70,12 +70,12 @@
                         <h1 class="display-4 fw-bold mb-4">Compassionate Care for Your Loved Ones</h1>
                         <p class="lead text-secondary mb-4">Professional in-home care services, assisted living support, and specialized care to help seniors live with dignity and independence</p>
                         <div class="d-flex flex-wrap gap-3 justify-content-center">
-                            <button class="btn btn-dark btn-lg px-4" onclick="(() => location.href = 'services.jsp')()">
+                            <button class="btn btn-dark btn-lg px-4" onclick="location.href = 'services.jsp'">
                                 Explore Our Services
                                 <i class="bi bi-arrow-right text-light"></i>
                             </button>
-                            <% if (session.getAttribute("username") == null) { %>
-                            	<button class="btn btn-outline-dark btn-lg px-4" onclick="(() => location.href = 'register.jsp')()">
+                            <% if (session.getAttribute("userRole") == null) { %>
+                            	<button class="btn btn-outline-dark btn-lg px-4" onclick="location.href = 'register.jsp'">
                             		Get Started Today
                             	</button>
                             <% } %>
@@ -91,7 +91,7 @@
                 <h2 class="text-center mb-5">Why Choose Silver Care?</h2>
                 <div class="row g-4">
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-2 card-hover">
+                        <div class="card h-100 border-2">
                             <div class="card-body text-center p-4">
                                 <div class="icon-circle mx-auto mb-3">
                                     <i class="bi bi-heart-fill text-primary" style="font-size: 1.5em"></i>
@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-2 card-hover">
+                        <div class="card h-100 border-2">
                             <div class="card-body text-center p-4">
                                 <div class="icon-circle mx-auto mb-3">
                                     <i class="bi bi-shield-check text-primary" style="font-size: 1.5em"></i>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-2 card-hover">
+                        <div class="card h-100 border-2">
                             <div class="card-body text-center p-4">
                                 <div class="icon-circle mx-auto mb-3">
                                     <i class="bi bi-clock text-primary" style="font-size: 1.5em"></i>
@@ -124,7 +124,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <div class="card h-100 border-2 card-hover">
+                        <div class="card h-100 border-2">
                             <div class="card-body text-center p-4">
                                 <div class="icon-circle mx-auto mb-3">
                                     <i class="fa-solid fa-user-group text-primary" style="font-size: 1.5em"></i>

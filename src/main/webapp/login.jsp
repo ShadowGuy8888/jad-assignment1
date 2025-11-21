@@ -8,7 +8,7 @@
     <title>Login</title>
     <%@ include file="designScripts.jsp" %>
 </head>
-<% if (session.getAttribute("username") != null) response.sendRedirect("logout.jsp"); %>
+<% if (session.getAttribute("userRole") != null) response.sendRedirect("logout.jsp"); %>
 <body>
 	<%@ include file="header.jsp" %>
 

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.Date;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -59,7 +60,10 @@ public class LoginServlet extends HttpServlet {
 
             // On successful login
             HttpSession session = req.getSession();
-            session.setAttribute("username", rs.getString("username"));
+            session.setAttribute("userId", rs.getString("id"));
+            session.setAttribute("username", usernameInput);
+            session.setAttribute("userRole", rs.getString("role"));
+            session.setAttribute("loginTimestamp", new Date());
 
             res.sendRedirect("index.jsp");
 
