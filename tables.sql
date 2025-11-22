@@ -55,6 +55,25 @@ CREATE TABLE `service_caregiver_qualification` (
   FOREIGN KEY (`service_id`) REFERENCES `service`(`id`) ON DELETE CASCADE
 );
 
+CREATE TABLE booking (
+  id int NOT NULL AUTO_INCREMENT,
+  user_id int NOT NULL,
+  service_id int NOT NULL,
+  booking_date date NOT NULL,
+  booking_time time NOT NULL,
+  duration_hours int NOT NULL,
+  total_price decimal(10,2) NOT NULL,
+  status enum('PENDING','CONFIRMED','CANCELLED','COMPLETED') NOT NULL DEFAULT 'PENDING',
+  notes text,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY booking_user_fk (user_id),
+  KEY booking_service_fk (service_id),
+  CONSTRAINT booking_service_fk FOREIGN KEY (service_id) REFERENCES service (id) ON DELETE CASCADE,
+  CONSTRAINT booking_user_fk FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+);
+
 DELIMITER //
 CREATE PROCEDURE register_user (
   IN p_username VARCHAR(100),

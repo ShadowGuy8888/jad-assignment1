@@ -1,4 +1,4 @@
-package com.jovan.servlets;
+package com.jovanchunyi.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -44,9 +44,10 @@ public class RegisterServlet extends HttpServlet {
 
         try {
         	Class.forName("com.mysql.cj.jdbc.Driver");
+
         	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
 			cs = conn.prepareCall("{ CALL register_user(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
-        	
+
 		    cs.setString(1, username);
 		    cs.setString(2, BCrypt.hashpw(password, BCrypt.gensalt(10)));
 		    cs.setString(3, email);

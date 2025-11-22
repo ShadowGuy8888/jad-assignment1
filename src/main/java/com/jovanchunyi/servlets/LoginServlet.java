@@ -1,4 +1,4 @@
-package com.jovan.servlets;
+package com.jovanchunyi.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -60,12 +60,33 @@ public class LoginServlet extends HttpServlet {
 
             // On successful login
             HttpSession session = req.getSession();
+
             session.setAttribute("userId", rs.getString("id"));
             session.setAttribute("username", usernameInput);
             session.setAttribute("userRole", rs.getString("role"));
             session.setAttribute("loginTimestamp", new Date());
 
-            res.sendRedirect("index.jsp");
+            session.setAttribute("email", rs.getString("email"));
+            session.setAttribute("phone", rs.getString("phone"));
+            session.setAttribute("firstName", rs.getString("first_name"));
+            session.setAttribute("lastName", rs.getString("last_name"));
+            session.setAttribute("createdAt", rs.getString("created_at"));
+            session.setAttribute("address", rs.getString("address"));
+            session.setAttribute("blockNo", rs.getString("blk_no"));
+            session.setAttribute("unitNo", rs.getString("unit_no"));
+            session.setAttribute("emergencyContact", rs.getString("emergency_contact"));
+
+            String role = rs.getString("role");
+            session.setAttribute("role", role);
+
+            if ("ADMIN".equals(role)) {
+                res.sendRedirect("admin.jsp");
+            } else if ("USER".equals(role)) {
+                res.sendRedirect("index.jsp");
+            } else {
+                res.sendRedirect("login.jsp"); // fallback
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();

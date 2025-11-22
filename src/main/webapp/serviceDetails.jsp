@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*" %>
+<%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,8 +15,12 @@
     </style>
 </head>
 <%
+	/* if (serviceId == null) {
+	    response.sendRedirect("services.jsp");
+	    return;
+	} */
 	Class.forName("com.mysql.cj.jdbc.Driver");
-	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+	Connection conn = DatabaseConnection.getConnection();
 	
 	String serviceId = request.getParameter("serviceId");
 	PreparedStatement ps = conn.prepareStatement(
@@ -96,83 +100,100 @@
 	                            </div>
 	                            <div class="card-body">
 	                                <ul class="list-unstyled mb-0">
-                                    <%
-                                    	for (String qualification : rs.getString("qualifications").split("\\|\\|")) {
-                                    %>
-		                                    <li class="d-flex align-items-start gap-2 mb-3">
-	                            				<i class="bi bi-check2-circle text-success"></i>
-		                                        <span><%= qualification %></span>
-		                                    </li>
 	                                <%
-                                    	}
+	                                   	for (String qualification : rs.getString("qualifications").split("\\|\\|")) {
 	                                %>
-	                                </ul>
-	                            </div>
-	                        </div>
-	                    </div>
-	
-	                    <!-- Right Column - Booking Form -->
-	                    <div class="col-lg-4">
-	                        <div class="card border sticky-booking">
-	                            <div class="card-header bg-white">
-	                                <h4 class="mb-0 h5">Book This Service</h4>
-	                            </div>
-	                            <div class="card-body">
-	                                <form>
-	                                    <div class="mb-3">
-	                                        <label for="quantity" class="form-label fw-semibold small">Number of Sessions/Hours</label>
-	                                        <input type="number" class="form-control" id="quantity" min="1" value="1">
-	                                    </div>
-	
-	                                    <div class="mb-3">
-	                                        <label for="date" class="form-label fw-semibold small">Preferred Date *</label>
-	                                        <div class="position-relative">
-	                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="position-absolute top-50 translate-middle-y ms-3" style="pointer-events: none;">
-	                                                <path d="M8 2v4"></path>
-	                                                <path d="M16 2v4"></path>
-	                                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-	                                                <path d="M3 10h18"></path>
-	                                            </svg>
-	                                            <input type="date" class="form-control ps-5" id="date" min="2025-11-13">
-	                                        </div>
-	                                    </div>
-	
-	                                    <div class="mb-3">
-	                                        <label for="time" class="form-label fw-semibold small">Preferred Time</label>
-	                                        <input type="time" class="form-control" id="time">
-	                                    </div>
-	
-	                                    <div class="mb-3">
-	                                        <label for="caregiver" class="form-label fw-semibold small">Caregiver Preference (Optional)</label>
-	                                        <input type="text" class="form-control" id="caregiver" placeholder="Request specific caregiver">
-	                                    </div>
-	
-	                                    <div class="mb-3">
-	                                        <label for="requests" class="form-label fw-semibold small">Special Requests or Care Needs</label>
-	                                        <textarea class="form-control" id="requests" rows="4" placeholder="Describe any specific needs or requests..."></textarea>
-	                                    </div>
-	
-	                                    <div class="border-top pt-3">
-	                                        <div class="d-flex justify-content-between align-items-center mb-3">
-	                                            <span>Total:</span>
-	                                            <span class="fs-3 text-success fw-semibold">$35.00</span>
-	                                        </div>
-	                                        <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
-	                                            <i class="bi bi-cart2"></i>
-	                                            Add to Booking Cart
-	                                        </button>
-	                                    </div>
-	                                </form>
-	                            </div>
-	                        </div>
-	                    </div>
+			                                <li class="d-flex align-items-start gap-2 mb-3">
+		                            			<i class="bi bi-check2-circle text-success"></i>
+			                                    <span><%= qualification %></span>
+			                                </li>
+		                            <%
+	                                   	}
+		                            %>
+                                	</ul>
+                            	</div>
+                        	</div>
+                    	</div>
+
+						<!-- Right Column - Booking Form -->
+						<div class="col-lg-4">
+						    <div class="card border sticky-booking">
+						        <div class="card-header bg-white">
+						            <h4 class="mb-0 h5">Book This Service</h4>
+						        </div>
+						        <div class="card-body">
+						            <form action="CreateBookingServlet" method="post">
+						                <%-- Hidden fields --%>
+						                <%
+						                    String sessionUserId = (String) session.getAttribute("userId");
+						                    String safeUserId = (sessionUserId != null) ? sessionUserId.toString() : "0";
+						                    String safeServiceId = (serviceId != null) ? serviceId : "0";
+						                %>
+						                <input type="hidden" name="user_id" value="<%= safeUserId %>">
+						                <input type="hidden" name="service_id" value="<%= safeServiceId %>">
+						
+						                <%-- Duration / Hours --%>
+						                <div class="mb-3">
+						                    <label class="form-label fw-semibold small">Number of Hours *</label>
+						                    <input type="number" class="form-control" name="duration" id="duration" min="1" value="1" required>
+						                </div>
+						
+						                <%-- Date --%>
+						                <div class="mb-3">
+						                    <label class="form-label fw-semibold small">Preferred Date *</label>
+						                    <input type="date" class="form-control" name="date" id="date" required>
+						                </div>
+						
+						                <%-- Time --%>
+						                <div class="mb-3">
+						                    <label class="form-label fw-semibold small">Preferred Time *</label>
+						                    <input type="time" class="form-control" name="time" id="time" required>
+						                </div>
+						
+						                <%-- Notes --%>
+						                <div class="mb-3">
+						                    <label class="form-label fw-semibold small">Special Requests (Optional)</label>
+						                    <textarea class="form-control" name="requests" id="requests" rows="4"></textarea>
+						                </div>
+						
+						                <%-- Total price shown to user --%>
+						                <div class="border-top pt-3">
+						                    <div class="d-flex justify-content-between align-items-center mb-3">
+						                        <span>Total:</span>
+						                        <span class="fs-3 text-success fw-semibold" id="priceDisplay">$<%= rs.getString("hourly_rate") %>.00</span>
+						                    </div>
+						
+						                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+						                        Add to Booking Cart
+						                    </button>
+						                </div>
+						            </form>
+						
+						            <%-- JS for dynamically updating total price --%>
+						            <script>
+						                const pricePerHour = <%= rs.getString("hourly_rate") %>; // hourly_rate from DB
+						
+						                function updateTotal() {
+						                    const hoursInput = document.getElementById("duration");
+						                    let hours = parseInt(hoursInput.value);
+						                    if (isNaN(hours) || hours < 1) hours = 1;
+						
+						                    const total = hours * pricePerHour;
+						
+						                    document.getElementById("priceDisplay").innerText = "$" + total.toFixed(2);
+						                }
+						
+						                document.getElementById("duration").addEventListener("input", updateTotal);
+						
+						                // Initialize total on page load
+						                updateTotal();
+						            </script>
+						        </div>
+						    </div>
+						</div>
 	                </div>
 	            </div>
 	        </section>
-    <%
-		} else {
-    %>
-    		<h1 class="text-danger">Service not found.</h1>
     <%
 		}
     %>
