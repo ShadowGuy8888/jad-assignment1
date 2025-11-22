@@ -1,5 +1,34 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ page import="java.sql.*, com.chunyi.util.DatabaseConnection" %>
+
+<%
+    String serviceId = request.getParameter("id");
+    if (serviceId == null) {
+        response.sendRedirect("services.jsp");
+        return;
+    }
+
+    Connection conn = DatabaseConnection.getConnection();
+    PreparedStatement ps = conn.prepareStatement(
+        "SELECT s.*, c.name AS category_name FROM service s " +
+        "JOIN service_category c ON s.category_id = c.id WHERE s.id = ?"
+    );
+    ps.setInt(1, Integer.parseInt(serviceId));
+    ResultSet rs = ps.executeQuery();
+
+    if (!rs.next()) {
+        response.sendRedirect("services.jsp");
+        return;
+    }
+
+    String serviceName = rs.getString("name");
+    String categoryName = rs.getString("category_name");
+    String description = rs.getString("description");
+    int price = rs.getInt("hourly_rate");
+    String image = rs.getString("image_url");
+%>
+    
 <!DOCTYPE html>
 <html>
 <head>
@@ -107,65 +136,84 @@
                         </div>
                     </div>
 
-                    <!-- Right Column - Booking Form -->
-                    <div class="col-lg-4">
-                        <div class="card border sticky-booking">
-                            <div class="card-header bg-white">
-                                <h4 class="mb-0 h5">Book This Service</h4>
-                            </div>
-                            <div class="card-body">
-                                <form>
-                                    <div class="mb-3">
-                                        <label for="quantity" class="form-label fw-semibold small">Number of Sessions/Hours</label>
-                                        <input type="number" class="form-control" id="quantity" min="1" value="1">
-                                    </div>
+<!-- Right Column - Booking Form -->
+<div class="col-lg-4">
+    <div class="card border sticky-booking">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 h5">Book This Service</h4>
+        </div>
+        <div class="card-body">
+            <form action="CreateBookingServlet" method="post">
+                <%-- Hidden fields --%>
+                <%
+                    Integer sessionUserId = (Integer) session.getAttribute("userId");
+                    String safeUserId = (sessionUserId != null) ? sessionUserId.toString() : "0";
+                    String safeServiceId = (serviceId != null) ? serviceId : "0";
+                %>
+                <input type="hidden" name="user_id" value="<%= safeUserId %>">
+                <input type="hidden" name="service_id" value="<%= safeServiceId %>">
 
-                                    <div class="mb-3">
-                                        <label for="date" class="form-label fw-semibold small">Preferred Date *</label>
-                                        <div class="position-relative">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="position-absolute top-50 translate-middle-y ms-3" style="pointer-events: none;">
-                                                <path d="M8 2v4"></path>
-                                                <path d="M16 2v4"></path>
-                                                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                                                <path d="M3 10h18"></path>
-                                            </svg>
-                                            <input type="date" class="form-control ps-5" id="date" min="2025-11-13">
-                                        </div>
-                                    </div>
+                <%-- Duration / Hours --%>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Number of Hours *</label>
+                    <input type="number" class="form-control" name="duration" id="duration" min="1" value="1" required>
+                </div>
 
-                                    <div class="mb-3">
-                                        <label for="time" class="form-label fw-semibold small">Preferred Time</label>
-                                        <input type="time" class="form-control" id="time">
-                                    </div>
+                <%-- Date --%>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Preferred Date *</label>
+                    <input type="date" class="form-control" name="date" id="date" required>
+                </div>
 
-                                    <div class="mb-3">
-                                        <label for="caregiver" class="form-label fw-semibold small">Caregiver Preference (Optional)</label>
-                                        <input type="text" class="form-control" id="caregiver" placeholder="Request specific caregiver">
-                                    </div>
+                <%-- Time --%>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Preferred Time *</label>
+                    <input type="time" class="form-control" name="time" id="time" required>
+                </div>
 
-                                    <div class="mb-3">
-                                        <label for="requests" class="form-label fw-semibold small">Special Requests or Care Needs</label>
-                                        <textarea class="form-control" id="requests" rows="4" placeholder="Describe any specific needs or requests..."></textarea>
-                                    </div>
+                <%-- Notes --%>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Special Requests (Optional)</label>
+                    <textarea class="form-control" name="requests" id="requests" rows="4"></textarea>
+                </div>
 
-                                    <div class="border-top pt-3">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span>Total:</span>
-                                            <span class="fs-3 text-success fw-semibold">$35.00</span>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="8" cy="21" r="1"></circle>
-                                                <circle cx="19" cy="21" r="1"></circle>
-                                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-                                            </svg>
-                                            Add to Booking Cart
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                <%-- Total price shown to user --%>
+                <div class="border-top pt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Total:</span>
+                        <span class="fs-3 text-success fw-semibold" id="priceDisplay">$<%= price %>.00</span>
                     </div>
+
+                    <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                        Add to Booking Cart
+                    </button>
+                </div>
+            </form>
+
+            <%-- JS for dynamically updating total price --%>
+            <script>
+                const pricePerHour = <%= price %>; // hourly_rate from DB
+
+                function updateTotal() {
+                    const hoursInput = document.getElementById("duration");
+                    let hours = parseInt(hoursInput.value);
+                    if (isNaN(hours) || hours < 1) hours = 1;
+
+                    const total = hours * pricePerHour;
+
+                    document.getElementById("priceDisplay").innerText = "$" + total.toFixed(2);
+                }
+
+                document.getElementById("duration").addEventListener("input", updateTotal);
+
+                // Initialize total on page load
+                updateTotal();
+            </script>
+        </div>
+    </div>
+</div>
+
+                    
                 </div>
             </div>
         </section>

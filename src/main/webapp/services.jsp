@@ -21,7 +21,7 @@
 	<% 
 		ArrayList<ServiceCategory> categories = new ArrayList<>();
 	    Class.forName("com.mysql.cj.jdbc.Driver");
-	    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+	    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "my-secret-pwd");
 	    Statement stmt = conn.createStatement();
 	    ResultSet rs = stmt.executeQuery("SELECT * FROM service_category;");
 	    while (rs.next()) {
@@ -160,7 +160,7 @@
                 <div class="row g-4">
 					<% 
 					    Class.forName("com.mysql.cj.jdbc.Driver");
-					    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+					    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "my-secret-pwd");
 					    PreparedStatement ps = conn.prepareStatement(
 				            "SELECT " +
 		                    "    s.id, " +
@@ -206,7 +206,11 @@
 		                                <div class="border-top pt-3 mb-3">
 		                                    <p class="small text-secondary mb-2">Caregiver Qualifications: <%= rs.getString(7) %></p>
 		                                </div>
-		                                <button class="btn btn-primary w-100 mt-auto" onclick="(() => location.href = 'serviceDetails.jsp')()">View Details & Book</button>
+		                                <button class="btn btn-primary w-100 mt-auto"
+		                                onclick="location.href='serviceDetails.jsp?id=<%= rs.getInt("id") %>'">
+		                                View Details & Book
+		                                </button>
+
 		                            </div>
 		                        </div>
 		                    </div>

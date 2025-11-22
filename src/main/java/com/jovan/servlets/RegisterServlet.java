@@ -45,7 +45,7 @@ public class RegisterServlet extends HttpServlet {
 
         try {
         	Class.forName("com.mysql.cj.jdbc.Driver");
-        	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+        	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "my-secret-pwd");
 			ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?");
         	
             ps.setString(1, username);

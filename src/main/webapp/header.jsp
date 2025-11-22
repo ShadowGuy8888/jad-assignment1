@@ -8,7 +8,7 @@
             <nav class="d-flex align-items-center gap-4">
                 <a href="index.jsp" class="text-decoration-none text-secondary fw-medium">Home</a>
                 <a href="services.jsp?categoryName=all" class="text-decoration-none text-secondary fw-medium">Services</a>
-                <i class="fa-solid fa-cart-shopping text-secondary"></i>
+                <a href="myBooking.jsp"><i class="fa-solid fa-cart-shopping text-secondary"></i></a>
             </nav>
             <div class="d-flex align-items-center gap-2">
 

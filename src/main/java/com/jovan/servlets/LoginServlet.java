@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "my-secret-pwd");
 
             ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?;");
             ps.setString(1, usernameInput);
@@ -60,8 +60,29 @@ public class LoginServlet extends HttpServlet {
             // On successful login
             HttpSession session = req.getSession();
             session.setAttribute("username", rs.getString("username"));
+            session.setAttribute("userId", rs.getInt("id"));
+            session.setAttribute("email", rs.getString("email"));
+            session.setAttribute("phone", rs.getString("phone"));
+            session.setAttribute("firstName", rs.getString("first_name"));
+            session.setAttribute("lastName", rs.getString("last_name"));
+            session.setAttribute("role", rs.getString("role"));
+            session.setAttribute("createdAt", rs.getString("created_at"));
+            session.setAttribute("address", rs.getString("address"));
+            session.setAttribute("blockNo", rs.getString("blk_no"));
+            session.setAttribute("unitNo", rs.getString("unit_no"));
+            session.setAttribute("emergencyContact", rs.getString("emergency_contact"));
 
-            res.sendRedirect("index.jsp");
+            String role = rs.getString("role");
+            session.setAttribute("role", role);
+
+            if ("ADMIN".equals(role)) {
+                res.sendRedirect("admin.jsp");
+            } else if ("USER".equals(role)) {
+                res.sendRedirect("index.jsp");
+            } else {
+                res.sendRedirect("login.jsp"); // fallback
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
