@@ -1,26 +1,50 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
-    // Access control - redirect to login if not logged in
     String username = (String) session.getAttribute("username");
-    String userRole = (String) session.getAttribute("userRole");
-    
+    String userRole = (String) session.getAttribute("role");
+
     if (username == null) {
         response.sendRedirect("login.jsp?error=Please login to access this page");
         return;
     }
+
+    if ("admin".equals(userRole)) {
+        response.sendRedirect("admin.jsp");
+        return;
+    }
+
+    String userId = (String) session.getAttribute("userId");
+
+    // Variables to hold user info
+    String email = "", phone = "", createdAt = "", firstName = "", lastName = "", address = "", emergencyContact = "", blkNo = "", unitNo = "";
+
+    if (userId != null && !userId.equals("0")) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM user WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, userId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        username = rs.getString("username"); // optional, overrides session
+                        email = rs.getString("email");
+                        phone = rs.getString("phone");
+                        createdAt = rs.getString("created_at"); // format as needed
+                        firstName = rs.getString("first_name");
+                        lastName = rs.getString("last_name");
+                        address = rs.getString("address");
+                        emergencyContact = rs.getString("emergency_contact");
+                        blkNo = rs.getString("blk_no");
+                        unitNo = rs.getString("unit_no");
+                      
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
-    // Get user information from session
-    Integer userId = (Integer) session.getAttribute("userId");
-    String email = (String) session.getAttribute("email");
-    String phone = (String) session.getAttribute("phone");
-    String firstName = (String) session.getAttribute("firstName");
-    String lastName = (String) session.getAttribute("lastName");
-    String address = (String) session.getAttribute("address");
-    String emergencyContact = (String) session.getAttribute("emergencyContact");
-    String blkNo = (String) session.getAttribute("blockNo");
-    String unitNo = (String) session.getAttribute("unitNo");
-    
-    // Get success/error messages
     String success = request.getParameter("success");
     String error = request.getParameter("error");
 %>

@@ -9,7 +9,7 @@ public class DatabaseConnection {
     // Database configuration - Update these values for your setup
     private static final String DB_URL = "jdbc:mysql://localhost:3306/silvercare";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password";
+    private static final String DB_PASSWORD = "my-secret-pwd";
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     
     // Static block to load driver once
