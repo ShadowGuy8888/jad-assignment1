@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import com.jovanchunyi.util.DatabaseConnection;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.Date;
@@ -45,7 +47,7 @@ public class RegisterServlet extends HttpServlet {
         try {
         	Class.forName("com.mysql.cj.jdbc.Driver");
 
-        	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
+        	conn = DatabaseConnection.getConnection();
 			cs = conn.prepareCall("{ CALL register_user(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
 
 		    cs.setString(1, username);

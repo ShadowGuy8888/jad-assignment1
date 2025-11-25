@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import com.jovanchunyi.util.DatabaseConnection;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.Date;
@@ -38,8 +40,8 @@ public class LoginServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
-
+            conn = DatabaseConnection.getConnection();
+            
             ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?;");
             ps.setString(1, usernameInput);
             rs = ps.executeQuery();
