@@ -1,4 +1,5 @@
-package com.jovan.servlets;
+// Author: Jovan Yap Keat An
+package com.jovanchunyi.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -6,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import com.jovanchunyi.util.DatabaseConnection;
 
 import java.io.IOException;
 import java.sql.*;
@@ -38,8 +41,8 @@ public class LoginServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/silvercare", "root", "password");
-
+            conn = DatabaseConnection.getConnection();
+            
             ps = conn.prepareStatement("SELECT * FROM user WHERE username = ?;");
             ps.setString(1, usernameInput);
             rs = ps.executeQuery();
@@ -51,7 +54,6 @@ public class LoginServlet extends HttpServlet {
             }
 
             String passwordHash = rs.getString("password");
-
             if (!BCrypt.checkpw(passwordInput, passwordHash)) {
                 req.setAttribute("error", "Invalid username and password!");
                 req.getRequestDispatcher("login.jsp").forward(req, res);
@@ -60,12 +62,19 @@ public class LoginServlet extends HttpServlet {
 
             // On successful login
             HttpSession session = req.getSession();
+
             session.setAttribute("userId", rs.getString("id"));
             session.setAttribute("username", usernameInput);
             session.setAttribute("userRole", rs.getString("role"));
             session.setAttribute("loginTimestamp", new Date());
 
-            res.sendRedirect("index.jsp");
+            if ("ADMIN".equals(rs.getString("role"))) {
+                res.sendRedirect("admin.jsp");
+
+            } else if ("USER".equals(rs.getString("role"))) {
+                res.sendRedirect("index.jsp");
+
+            } else res.sendRedirect("login.jsp"); // fallback
 
         } catch (Exception e) {
             e.printStackTrace();
