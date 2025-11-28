@@ -1,3 +1,4 @@
+// Author: Lau Chun Yi
 package com.jovanchunyi.servlets;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class CancelBookingServlet extends HttpServlet {
 
         String bookingIdParam = request.getParameter("bookingId");
         if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-            response.sendRedirect("myBookings.jsp?error=Invalid booking ID");
+            response.sendRedirect("myBooking.jsp?error=Invalid booking ID");
             return;
         }
         int bookingId = Integer.parseInt(bookingIdParam);
@@ -50,14 +51,14 @@ public class CancelBookingServlet extends HttpServlet {
             int rowsAffected = ps.executeUpdate();
 
             if (rowsAffected > 0) {
-                response.sendRedirect("myBookings.jsp?success=Booking cancelled successfully");
+                response.sendRedirect("myBooking.jsp?success=Booking cancelled successfully");
             } else {
-                response.sendRedirect("myBookings.jsp?error=Unable to cancel booking");
+                response.sendRedirect("myBooking.jsp?error=Unable to cancel booking");
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendRedirect("myBookings.jsp?error=Database error");
+            response.sendRedirect("myBooking.jsp?error=Database error");
         }
     }
 }

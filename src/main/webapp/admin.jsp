@@ -1,12 +1,12 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page contentType="text/html;charset=UTF-8" language="java" import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
-    String role = (String) session.getAttribute("role");
-    if (role == null || !role.equals("ADMIN")) {
+	String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("userRole");
+    if (role == null || !"ADMIN".equals(role)) {
         response.sendRedirect("login.jsp?error=Access denied");
         return;
     }
-    String firstName = (String) session.getAttribute("firstName");
-    String lastName = (String) session.getAttribute("lastName");
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -41,8 +41,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <%@ include file="designScripts.jsp" %>
     <style>
         .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
         .nav-pills .nav-link.active { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
@@ -55,7 +54,7 @@
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="#"><i class="bi bi-heart-pulse text-primary me-2"></i>CareAdmin</a>
             <div class="d-flex align-items-center gap-3">
-                <span class="text-muted d-none d-md-inline">Welcome, <%= firstName %> <%= lastName %></span>
+                <span class="text-muted d-none d-md-inline">Welcome, <%= username %></span>
                 <a href="logout.jsp" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
             </div>
         </div>

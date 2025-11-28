@@ -1,35 +1,6 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
-<%
-    // Access control
-    String userId = (String) session.getAttribute("userId");
-
-    if (userId == null) {
-        response.sendRedirect("login.jsp?error=Please login to access this page");
-        return;
-    }
-
-    // Fetch bookings for this user
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    String fetchBookingsSql = "SELECT b.*, s.name AS service_name, s.hourly_rate "
-                            + "FROM booking b "
-                            + "JOIN service s ON b.service_id = s.id "
-                            + "WHERE b.user_id = ? "
-                            + "ORDER BY b.booking_date DESC, b.booking_time DESC";
-
-    try {
-        conn = DatabaseConnection.getConnection();
-        ps = conn.prepareStatement(fetchBookingsSql);
-        ps.setString(1, userId);
-        rs = ps.executeQuery();
-    } catch(Exception e) {
-        e.printStackTrace();
-    }
-%>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,24 +22,33 @@
         .empty-state i { font-size: 4rem; color: #dee2e6; margin-bottom: 1rem; }
     </style>
 </head>
+<%
+    if (session.getAttribute("userRole") == null) {
+        response.sendRedirect("login.jsp?error=Please login to access this page");
+        return;
+    }
+
+    // Fetch bookings for this user
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;   
+%>
 <body>
 <main>
 	<%@ include file="header.jsp" %>
-    <section class="bg-white border-bottom">
-        <div class="container py-4">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h2 class="mb-0">My Bookings</h2>
-                    <p class="text-secondary mb-0">View and manage your service bookings</p>
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-primary" onclick="location.href='services.jsp'">
-                        <i class="bi bi-plus-circle me-2"></i>New Booking
-                    </button>
-                </div>
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="mb-0">My Bookings</h2>
+                <p class="text-secondary mb-0">View and manage your service bookings</p>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" onclick="location.href='services.jsp'">
+                    <i class="bi bi-plus-circle me-2"></i>New Booking
+                </button>
             </div>
         </div>
-    </section>
+    </div>
 
     <div class="container my-4">
         <!-- Filter Tabs -->
@@ -85,29 +65,40 @@
 
         <!-- Booking Cards -->
         <%
-            boolean hasBookings = false;
-            while(rs != null && rs.next()) {
-                hasBookings = true;
-                String bookingId = rs.getString("id");
-                String serviceName = rs.getString("service_name");
-                Date bookingDate = rs.getDate("booking_date");
-                Time bookingTime = rs.getTime("booking_time");
-                String duration = rs.getString("duration_hours");
-                double totalPrice = rs.getDouble("total_price");
-                String status = rs.getString("status");
-                String notes = rs.getString("notes");
-                
-                // Determine if upcoming (today or later) or completed/cancelled
-                String statusClass = status.toLowerCase();
+			String fetchBookingsSql = "SELECT b.*, s.name AS service_name, s.hourly_rate "
+			                + "FROM booking b "
+			                + "JOIN service s ON b.service_id = s.id "
+			                + "WHERE b.user_id = ? "
+			                + "ORDER BY b.booking_date DESC, b.booking_time DESC";
+			
+			try {
+				conn = DatabaseConnection.getConnection();
+				ps = conn.prepareStatement(fetchBookingsSql);
+				ps.setString(1, (String) session.getAttribute("userId"));
+				rs = ps.executeQuery();
+	            boolean hasBookings = false;
+	            while (rs.next()) {
+	                hasBookings = true;
+	                String bookingId = rs.getString("id");
+	                String serviceName = rs.getString("service_name");
+	                Date bookingDate = rs.getDate("booking_date");
+	                Time bookingTime = rs.getTime("booking_time");
+	                String duration = rs.getString("duration_hours");
+	                double totalPrice = rs.getDouble("total_price");
+	                String status = rs.getString("status");
+	                String notes = rs.getString("notes");
+	                
+	                // Determine if upcoming (today or later) or completed/cancelled
+	                String statusClass = status.toLowerCase();
         %>
-        <div class="card booking-card shadow-sm mb-3" data-status="<%=statusClass%>">
+        <div class="card booking-card shadow-sm mb-3" data-status="<%= statusClass %>">
             <div class="card-body p-4">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <h5 class="mb-1"><%= serviceName %></h5>
-                                <span class="status-badge status-<%=statusClass%>"><%= status %></span>
+                                <span class="status-badge status-<%= statusClass %>"><%= status %></span>
                             </div>
                             <span class="text-secondary">Booking #<%= bookingId %></span>
                         </div>
@@ -144,18 +135,28 @@
                 </div>
             </div>
         </div>
-        <% } %>
-
-        <% if(!hasBookings) { %>
-            <div class="empty-state">
-                <i class="bi bi-calendar-x"></i>
-                <p>No bookings found. <a href="services.jsp">Book a service now</a></p>
-            </div>
-        <% } %>
+			<% 
+			    } 
+	            if(!hasBookings) { 
+	        %> 
+			        <div class="empty-state">
+			            <i class="bi bi-calendar-x"></i>
+			            <p>No bookings found. <a href="services.jsp">Book a service now</a></p>
+			        </div>
+		<%
+			    }
+	            
+		    } catch (Exception e) {
+				e.printStackTrace();
+				
+		    } finally {
+	           if(rs != null) rs.close();
+	           if(ps != null) ps.close();
+	           if(conn != null) conn.close();
+		    } 
+		%>
     </div>
 </main>
-
-<%@ include file="footer.jsp" %>
 
 <script>
     function filterBookings(filter) {
@@ -176,12 +177,6 @@
         });
     }
 </script>
-
-<%
-    // Close resources
-    if(rs != null) rs.close();
-    if(ps != null) ps.close();
-    if(conn != null) conn.close();
-%>
+<%@ include file="footer.jsp" %>
 </body>
 </html>

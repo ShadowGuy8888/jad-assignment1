@@ -1,10 +1,4 @@
-<!--
-  - Author: Jovan Yap Keat An
-  - Date: 27 / 11 / 2025
-  - Copyright Notice: © 2025 JovanYKA
-  - @(#)
-  - Description: ST0510/JAD Assignment 1 submission
-  -->
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
@@ -51,6 +45,10 @@
             background-color: #F3F4F6;
             padding: 4px;
             border-radius: 0.75rem;
+        }
+        .service-image {
+            object-fit: cover;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -137,23 +135,24 @@
 		                        <div class="card h-100 border service-card">
 		                            <div class="card-body d-flex flex-column">
 		                                <div class="d-flex justify-content-between align-items-start mb-3">
-		                                    <div class="icon-box">
-		                                        <i class="bi bi-house-door text-primary" style="font-size: 1.5em;"></i>
-		                                    </div>
-		                                    <span class="badge bg-secondary"><%= rs.getString(6) %></span>
+	                                        <img src="<%= rs.getString("image_url") %>" 
+		                                        alt="serviceId<%= rs.getString("id") %>_img" 
+		                                        class="service-image img-fluid" 
+		                                        style="width: 80px; height: 80px;" />
+		                                    <span class="badge bg-secondary"><%= rs.getString("service_category_name") %></span>
 		                                </div>
-		                                <h5 class="card-title mb-2"><%= rs.getString(2) %></h5>
-		                                <p class="text-secondary mb-3"><%= rs.getString(3) %></p>
+		                                <h5 class="card-title mb-2"><%= rs.getString("service_name") %></h5>
+		                                <p class="text-secondary mb-3"><%= rs.getString("description") %></p>
 		                                <div class="mb-3">
 		                                    <div class="d-flex align-items-center gap-2 mb-2 small">
 		                                        <i class="fa-solid fa-dollar-sign text-secondary"></i>
-		                                        <span class="text-success fw-semibold">&nbsp;$<%= rs.getString(4) %> per hour</span>
+		                                        <span class="text-success fw-semibold">&nbsp;$<%= rs.getString("hourly_rate") %> per hour</span>
 		                                    </div>
 		                                </div>
 		                                <div class="border-top pt-3 mb-3">
-		                                    <p class="small text-secondary mb-2">Caregiver Qualifications: <%= rs.getString(7) %></p>
+		                                    <p class="small text-secondary mb-2">Caregiver Qualifications: <%= rs.getString("qualifications") %></p>
 		                                </div>
-		                                <input type="hidden" name="serviceId" value="<%= rs.getString(1) %>">
+		                                <input type="hidden" name="serviceId" value="<%= rs.getString("id") %>">
 		                                <input type="submit" class="btn btn-primary w-100 mt-auto" value="View Details & Book"></input>
 		                            </div>
 		                        </div>
@@ -176,8 +175,7 @@
                         <h2 class="mb-3">Need Help Choosing?</h2>
                         <p class="text-secondary mb-4">Our care coordinators are available to help you find the perfect services for your loved one's needs. Contact us for a free consultation.</p>
                         <div class="d-flex flex-wrap gap-3 justify-content-center">
-                            <button class="btn btn-primary btn-lg px-4">Call (555) 123-4567</button>
-                            <button class="btn btn-outline-secondary btn-lg px-4">Request Consultation</button>
+                            <button class="btn btn-primary btn-lg px-4">Call (65) 9788 0822</button>
                         </div>
                     </div>
                 </div>

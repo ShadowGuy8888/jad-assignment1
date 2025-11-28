@@ -1,3 +1,4 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
@@ -9,7 +10,7 @@
 
     String bookingIdParam = request.getParameter("id");
     if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-        response.sendRedirect("myBookings.jsp?error=Invalid booking ID");
+        response.sendRedirect("myBooking.jsp?error=Invalid booking ID");
         return;
     }
     int bookingId = Integer.parseInt(bookingIdParam);
@@ -36,7 +37,7 @@
         rs = ps.executeQuery();
 
         if (!rs.next()) {
-            response.sendRedirect("myBookings.jsp?error=Booking not found");
+            response.sendRedirect("myBooking.jsp?error=Booking not found");
             return;
         }
 
@@ -51,8 +52,8 @@
         notes = rs.getString("notes");
 
         // Check if can be edited
-        if ("CANCELLED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status)) {
-            response.sendRedirect("myBookings.jsp?error=This booking cannot be edited");
+        if ("CANCELLED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status)) {
+            response.sendRedirect("myBooking.jsp?error=This booking cannot be edited");
             return;
         }
     } catch (Exception e) {

@@ -1,3 +1,4 @@
+// Author: Jovan Yap Keat An
 package com.jovanchunyi.servlets;
 
 import jakarta.servlet.ServletException;
@@ -53,7 +54,6 @@ public class LoginServlet extends HttpServlet {
             }
 
             String passwordHash = rs.getString("password");
-
             if (!BCrypt.checkpw(passwordInput, passwordHash)) {
                 req.setAttribute("error", "Invalid username and password!");
                 req.getRequestDispatcher("login.jsp").forward(req, res);
@@ -68,27 +68,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userRole", rs.getString("role"));
             session.setAttribute("loginTimestamp", new Date());
 
-            session.setAttribute("email", rs.getString("email"));
-            session.setAttribute("phone", rs.getString("phone"));
-            session.setAttribute("firstName", rs.getString("first_name"));
-            session.setAttribute("lastName", rs.getString("last_name"));
-            session.setAttribute("createdAt", rs.getString("created_at"));
-            session.setAttribute("address", rs.getString("address"));
-            session.setAttribute("blockNo", rs.getString("blk_no"));
-            session.setAttribute("unitNo", rs.getString("unit_no"));
-            session.setAttribute("emergencyContact", rs.getString("emergency_contact"));
-
-            String role = rs.getString("role");
-            session.setAttribute("role", role);
-
-            if ("ADMIN".equals(role)) {
+            if ("ADMIN".equals(rs.getString("role"))) {
                 res.sendRedirect("admin.jsp");
-            } else if ("USER".equals(role)) {
-                res.sendRedirect("index.jsp");
-            } else {
-                res.sendRedirect("login.jsp"); // fallback
-            }
 
+            } else if ("USER".equals(rs.getString("role"))) {
+                res.sendRedirect("index.jsp");
+
+            } else res.sendRedirect("login.jsp"); // fallback
 
         } catch (Exception e) {
             e.printStackTrace();

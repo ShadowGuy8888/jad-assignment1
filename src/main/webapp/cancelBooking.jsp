@@ -1,3 +1,4 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
@@ -49,7 +50,7 @@
 
         // Check if already cancelled or completed
         if ("CANCELLED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status)) {
-            response.sendRedirect("myBookings.jsp?error=This booking cannot be cancelled");
+            response.sendRedirect("myBooking.jsp?error=This booking cannot be cancelled");
             return;
         }
     } catch (Exception e) {

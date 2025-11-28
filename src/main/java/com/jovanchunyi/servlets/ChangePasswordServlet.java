@@ -1,3 +1,4 @@
+// Author: Lau Chun Yi
 package com.jovanchunyi.servlets;
 
 import java.io.IOException;
@@ -50,12 +51,6 @@ public class ChangePasswordServlet extends HttpServlet {
         // Check if new passwords match
         if (!newPassword.equals(confirmPassword)) {
             response.sendRedirect("editProfile.jsp?error=New passwords do not match");
-            return;
-        }
-
-        // Check minimum password length
-        if (newPassword.length() < 8) {
-            response.sendRedirect("editProfile.jsp?error=Password must be at least 8 characters long");
             return;
         }
 

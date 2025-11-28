@@ -1,7 +1,8 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
     String username = (String) session.getAttribute("username");
-    String userRole = (String) session.getAttribute("role");
+    String userRole = (String) session.getAttribute("userRole");
 
     if (username == null) {
         response.sendRedirect("login.jsp?error=Please login to access this page");
@@ -36,15 +37,12 @@
             e.printStackTrace();
         }
     }
-%>
-<%
-    userId = (session.getAttribute("userId") != null) ? (String) session.getAttribute("userId") : null;
 
     List<Map<String, Object>> upcomingBookings = new ArrayList<>();
     List<Map<String, Object>> recentActivities = new ArrayList<>();
     int totalBookings = 0, upcomingCount = 0;
 
-    if (userId != null && !userId.equals("0")) {
+    if (userId != null && !"0".equals(userId)) {
         try (Connection conn = DatabaseConnection.getConnection()) {
             // Total bookings count
             try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM booking WHERE user_id = ?")) {
@@ -170,7 +168,6 @@
                             <a href="services.jsp" class="btn btn-primary"><i class="bi bi-calendar-plus me-2"></i>Book New Service</a>
                             <a href="myBooking.jsp" class="btn btn-outline-primary"><i class="bi bi-list-check me-2"></i>View All Bookings</a>
                             <a href="services.jsp" class="btn btn-outline-primary"><i class="bi bi-search me-2"></i>Browse Services</a>
-                            <button class="btn btn-outline-primary" onclick="alert('Support feature coming soon!')"><i class="bi bi-headset me-2"></i>Contact Support</button>
                         </div>
                     </div>
                 </div>
@@ -246,16 +243,17 @@
                             <% if (recentActivities.isEmpty()) { %>
                                 <p class="text-secondary mb-0">No recent updates</p>
                             <% } else { for (Map<String, Object> a : recentActivities) { %>
-                            <div class="bg-white p-3 rounded mb-2 border-start border-4 border-primary">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="mb-1"><%= a.get("service_name") %> - <%= a.get("status") %></h6>
-                                        <small class="text-secondary">Booking #<%= a.get("id") %></small>
-                                    </div>
-                                    <small class="text-secondary"><%= a.get("updated") != null ? a.get("updated") : "" %></small>
-                                </div>
-                            </div>
-                            <% } } %>
+	                            <div class="bg-white p-3 rounded mb-2 border-start border-4 border-primary">
+	                                <div class="d-flex justify-content-between align-items-start">
+	                                    <div>
+	                                        <h6 class="mb-1"><%= a.get("service_name") %> - <%= a.get("status") %></h6>
+	                                        <small class="text-secondary">Booking #<%= a.get("id") %></small>
+	                                    </div>
+	                                    <small class="text-secondary"><%= a.get("updated") != null ? a.get("updated") : "" %></small>
+	                                </div>
+	                            </div>
+                            <% } 
+                            } %>
                         </div>
                     </div>
                 </div>

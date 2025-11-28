@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-
+<!-- Author: Jovan Yap Keat An -->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -227,7 +226,7 @@
                                 </div>
                                 <p class="fst-italic text-secondary mb-3">"The caregivers at Silver Care have been wonderful with my mother. They treat her with such respect and kindness."</p>
                                 <div>
-                                    <p class="mb-0 fw-semibold">Margaret Thompson</p>
+                                    <p class="mb-0 fw-semibold">Susan Tay</p>
                                     <p class="small text-secondary mb-0">Daughter of Client</p>
                                 </div>
                             </div>
@@ -263,7 +262,7 @@
                                 </div>
                                 <p class="fst-italic text-secondary mb-3">"After my surgery, their post-operative care services helped me recover comfortably at home. Highly recommended!"</p>
                                 <div>
-                                    <p class="mb-0 fw-semibold">Susan Williams</p>
+                                    <p class="mb-0 fw-semibold">Freya Wong</p>
                                     <p class="small text-secondary mb-0">Client</p>
                                 </div>
                             </div>

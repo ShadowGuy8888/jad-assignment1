@@ -1,3 +1,4 @@
+// Author: Lau Chun Yi
 package com.jovanchunyi.servlets;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class EditBookingServlet extends HttpServlet {
         // Get form parameters
         String bookingIdParam = request.getParameter("bookingId");
         if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-            response.sendRedirect("myBookings.jsp?error=Invalid booking ID");
+            response.sendRedirect("myBooking.jsp?error=Invalid booking ID");
             return;
         }
         int bookingId = Integer.parseInt(bookingIdParam);

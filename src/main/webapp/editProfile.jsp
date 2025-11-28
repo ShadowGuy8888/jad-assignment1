@@ -1,8 +1,9 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
     String username = (String) session.getAttribute("username");
-    String userRole = (String) session.getAttribute("role");
+    String userRole = (String) session.getAttribute("userRole");
 
     if (username == null) {
         response.sendRedirect("login.jsp?error=Please login to access this page");
@@ -68,7 +69,7 @@
                     </div>
                     <div class="col-auto">
                         <a href="index.jsp" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                            <i class="bi bi-arrow-left me-2"></i>Back to Home
                         </a>
                     </div>
                 </div>
@@ -202,9 +203,7 @@
 
                                 <div class="mb-3">
                                     <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control" id="newPassword" name="newPassword" 
-                                           minlength="8" required>
-                                    <small class="text-muted">Minimum 8 characters</small>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
                                 </div>
 
                                 <div class="mb-4">
@@ -236,12 +235,6 @@
             if (newPassword !== confirmPassword) {
                 e.preventDefault();
                 alert('New passwords do not match!');
-                return false;
-            }
-            
-            if (newPassword.length < 8) {
-                e.preventDefault();
-                alert('Password must be at least 8 characters long!');
                 return false;
             }
         });

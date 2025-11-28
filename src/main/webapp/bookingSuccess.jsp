@@ -1,8 +1,16 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmed</title>
+    <%@ include file="designScripts.jsp" %>
+</head>
 <%
-    String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
+	// Access control
+    if (session.getAttribute("userRole") == null) {
         response.sendRedirect("login.jsp?error=Please login first");
         return;
     }
@@ -26,7 +34,7 @@
             "FROM booking b JOIN service s ON b.service_id = s.id " +
             "WHERE b.user_id = ? ORDER BY b.id DESC LIMIT 1"
         );
-        ps.setString(1, userId);
+        ps.setString(1, (String) session.getAttribute("userId"));
         rs = ps.executeQuery();
         
         if (rs.next()) {
@@ -45,17 +53,9 @@
         if (conn != null) conn.close();
     }
 %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Booking Confirmed</title>
-    <%@ include file="designScripts.jsp" %>
-</head>
 <body>
     <%@ include file="header.jsp" %>
-
-    <main class="py-5">
+    
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6">
@@ -65,10 +65,7 @@
                             <!-- Success Icon -->
                             <div class="mb-4">
                                 <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle" style="width: 80px; height: 80px;">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="m9 12 2 2 4-4"></path>
-                                    </svg>
+                                    <i class="bi bi-check-circle text-success" style="font-size: 2em;"></i>
                                 </div>
                             </div>
 
@@ -109,12 +106,7 @@
                             <!-- Action Buttons -->
                             <div class="d-flex gap-2 justify-content-center">
                                 <a href="myBooking.jsp" class="btn btn-primary">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
-                                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                                        <line x1="16" x2="16" y1="2" y2="6"></line>
-                                        <line x1="8" x2="8" y1="2" y2="6"></line>
-                                        <line x1="3" x2="21" y1="10" y2="10"></line>
-                                    </svg>
+                                    <i class="bi bi-calendar4"></i>
                                     View My Bookings
                                 </a>
                                 <a href="services.jsp" class="btn btn-outline-secondary">
@@ -124,19 +116,9 @@
                         </div>
                     </div>
 
-                    <!-- Info Note -->
-                    <div class="alert alert-info d-flex align-items-start gap-2 mt-4" role="alert">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0" style="margin-top: 2px;">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M12 16v-4"></path>
-                            <path d="M12 8h.01"></path>
-                        </svg>
-                        <small>A confirmation email has been sent to your registered email address. Please check your inbox for more details.</small>
-                    </div>
                 </div>
             </div>
         </div>
-    </main>
 
     <%@ include file="footer.jsp" %>
 </body>

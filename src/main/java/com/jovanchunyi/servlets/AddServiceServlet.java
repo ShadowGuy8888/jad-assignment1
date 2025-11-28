@@ -1,3 +1,4 @@
+// Author: Lau Chun Yi
 package com.jovanchunyi.servlets;
 
 import java.io.IOException;
@@ -19,16 +20,14 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/AddServiceServlet")
 public class AddServiceServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
+        String role = (String) session.getAttribute("userRole");
 
-        if (role == null || !role.equals("ADMIN")) {
+        if (role == null || !"ADMIN".equals(role)) {
             response.sendRedirect("login.jsp?error=Access denied");
             return;
         }

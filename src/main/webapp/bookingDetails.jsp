@@ -1,19 +1,34 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Details - Silver Care</title>
+    <%@ include file="designScripts.jsp" %>
+    <style>
+        .status-badge { padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.875rem; font-weight: 500; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-confirmed { background-color: #d4edda; color: #155724; }
+        .status-completed { background-color: #cce5ff; color: #004085; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+        .detail-label { font-size: 0.85rem; color: #6c757d; margin-bottom: 0.25rem; }
+        .detail-value { font-weight: 500; }
+    </style>
+</head>
 <%
     // Access control
-    String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
+    if (session.getAttribute("userRole") == null) {
         response.sendRedirect("login.jsp?error=Please login first");
         return;
     }
 
     String bookingIdParam = request.getParameter("id");
-    if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-        response.sendRedirect("myBookings.jsp?error=Invalid booking ID");
+    if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) { // validation check for bookId query param
+        response.sendRedirect("myBooking.jsp?error=Invalid booking ID");
         return;
     }
-    int bookingId = Integer.parseInt(bookingIdParam);
 
     // DB variables
     Connection conn = null;
@@ -34,12 +49,12 @@
                      "JOIN service_category c ON s.category_id = c.id " +
                      "WHERE b.id = ? AND b.user_id = ?";
         ps = conn.prepareStatement(sql);
-        ps.setInt(1, bookingId);
-        ps.setString(2, userId);
+        ps.setString(1, bookingIdParam);
+        ps.setString(2, (String) session.getAttribute("userId"));
         rs = ps.executeQuery();
 
         if (!rs.next()) {
-            response.sendRedirect("myBookings.jsp?error=Booking not found");
+            response.sendRedirect("myBooking.jsp?error=Booking not found");
             return;
         }
 
@@ -52,8 +67,10 @@
         bookingTime = rs.getTime("booking_time");
         status = rs.getString("status");
         notes = rs.getString("notes");
+        
     } catch (Exception e) {
         e.printStackTrace();
+        
     } finally {
         if(rs != null) rs.close();
         if(ps != null) ps.close();
@@ -62,26 +79,8 @@
 
     String statusClass = status != null ? status.toLowerCase() : "pending";
 %>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Booking Details - Silver Care</title>
-    <%@ include file="designScripts.jsp" %>
-    <style>
-        .status-badge { padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.875rem; font-weight: 500; }
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .status-confirmed { background-color: #d4edda; color: #155724; }
-        .status-completed { background-color: #cce5ff; color: #004085; }
-        .status-cancelled { background-color: #f8d7da; color: #721c24; }
-        .detail-label { font-size: 0.85rem; color: #6c757d; margin-bottom: 0.25rem; }
-        .detail-value { font-weight: 500; }
-    </style>
-</head>
 <body>
 <%@ include file="header.jsp" %>
-
 <main>
     <section class="bg-light py-3 border-bottom">
         <div class="container">
@@ -100,7 +99,7 @@
                         <div>
                             <span class="badge bg-primary mb-2"><%= categoryName %></span>
                             <h1 class="h3 mb-2"><%= serviceName %></h1>
-                            <span class="text-muted">Booking #<%= bookingId %></span>
+                            <span class="text-muted">Booking #<%= bookingIdParam %></span>
                         </div>
                         <span class="status-badge status-<%= statusClass %>"><%= status %></span>
                     </div>
@@ -163,9 +162,9 @@
 
                         <!-- Actions -->
                         <div class="card-body d-grid gap-2">
-                            <% if (statusClass.equals("pending") || statusClass.equals("confirmed")) { %>
-                            <a href="editBooking.jsp?id=<%= bookingId %>" class="btn btn-outline-primary">Edit Booking</a>
-                            <a href="cancelBooking.jsp?id=<%= bookingId %>" class="btn btn-outline-danger">Cancel Booking</a>
+                            <% if (statusClass.equals("pending")) { %>
+                            <a href="editBooking.jsp?id=<%= bookingIdParam %>" class="btn btn-outline-primary">Edit Booking</a>
+                            <a href="cancelBooking.jsp?id=<%= bookingIdParam %>" class="btn btn-outline-danger">Cancel Booking</a>
                             <% } %>
                             <a href="myBooking.jsp" class="btn btn-secondary">Back to Bookings</a>
                         </div>

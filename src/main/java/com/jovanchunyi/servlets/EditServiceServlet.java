@@ -1,3 +1,4 @@
+// Author: Lau Chun Yi
 package com.jovanchunyi.servlets;
 
 import java.io.IOException;
@@ -24,9 +25,9 @@ public class EditServiceServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
+        String role = (String) session.getAttribute("userRole");
 
-        if (role == null || !role.equals("ADMIN")) {
+        if (role == null || !"ADMIN".equals(role)) {
             response.sendRedirect("login.jsp?error=Access denied");
             return;
         }

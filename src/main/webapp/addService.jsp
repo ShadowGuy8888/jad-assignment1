@@ -1,8 +1,9 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
-    String role = (String) session.getAttribute("role");
-    if (role == null || !role.equals("ADMIN")) {
+    String role = (String) session.getAttribute("userRole");
+    if (role == null || !"ADMIN".equals(role)) {
         response.sendRedirect("login.jsp?error=Access denied");
         return;
     }
@@ -18,8 +19,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Service - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <%@ include file="designScripts.jsp" %>
 </head>
 <body class="bg-light">
     <nav class="navbar bg-white border-bottom">

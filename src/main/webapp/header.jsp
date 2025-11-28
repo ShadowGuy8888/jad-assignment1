@@ -1,7 +1,8 @@
+<!-- Author: Jovan Yap Keat An -->
 <header class="bg-white border-bottom">
     <div class="container py-3">
         <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2" onclick="location.href = 'index.jsp';">
                 <i class="bi bi-suit-heart-fill text-primary" style="font-size: 1.5em;"></i>
                 <span class="fs-5 fw-semibold">Silver Care</span>
             </div>

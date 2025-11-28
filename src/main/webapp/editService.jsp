@@ -1,8 +1,9 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
 <%
-    String role = (String) session.getAttribute("role");
-    if (role == null || !role.equals("ADMIN")) {
+    String role = (String) session.getAttribute("userRole");
+    if (role == null || !"ADMIN".equals(role)) {
         response.sendRedirect("login.jsp?error=Access denied");
         return;
     }
