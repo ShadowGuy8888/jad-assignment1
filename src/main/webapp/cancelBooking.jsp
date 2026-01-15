@@ -1,64 +1,12 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
+<%@ page import="java.sql.Timestamp" %>
 <%
-    String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
-        response.sendRedirect("login.jsp?error=Please login first");
-        return;
-    }
-
-    String bookingIdParam = request.getParameter("id");
-    if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-        response.sendRedirect("myBooking.jsp?error=Invalid booking ID");
-        return;
-    }
-    int bookingId = Integer.parseInt(bookingIdParam);
-
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    String serviceName = "", status = "";
-    Date bookingDate = null;
-    Time bookingTime = null;
-    int duration = 0;
-    double totalPrice = 0;
-
-    try {
-        conn = DatabaseConnection.getConnection();
-        ps = conn.prepareStatement(
-            "SELECT b.*, s.name AS service_name FROM booking b " +
-            "JOIN service s ON b.service_id = s.id " +
-            "WHERE b.id = ? AND b.user_id = ?"
-        );
-        ps.setInt(1, bookingId);
-        ps.setString(2, userId);
-        rs = ps.executeQuery();
-
-        if (!rs.next()) {
-            response.sendRedirect("myBooking.jsp?error=Booking not found");
-            return;
-        }
-
-        serviceName = rs.getString("service_name");
-        status = rs.getString("status");
-        bookingDate = rs.getDate("booking_date");
-        bookingTime = rs.getTime("booking_time");
-        duration = rs.getInt("duration_hours");
-        totalPrice = rs.getDouble("total_price");
-
-        // Check if already cancelled or completed
-        if ("CANCELLED".equalsIgnoreCase(status) || "COMPLETED".equalsIgnoreCase(status)) {
-            response.sendRedirect("myBookings.jsp?error=This booking cannot be cancelled");
-            return;
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        if (rs != null) rs.close();
-        if (ps != null) ps.close();
-        if (conn != null) conn.close();
-    }
+    String bookingIdParam = (String) request.getAttribute("bookingId");
+    String serviceName = (String) request.getAttribute("serviceName");
+    Timestamp bookingTimestamp = (Timestamp) request.getAttribute("bookingTimestamp");
+    Integer duration = (Integer) request.getAttribute("duration");
+    Double totalPrice = (Double) request.getAttribute("totalPrice");
 %>
 <!DOCTYPE html>
 <html>
@@ -73,7 +21,7 @@
 <main>
     <section class="bg-light py-3 border-bottom">
         <div class="container">
-            <a href="bookingDetails.jsp?id=<%= bookingId %>" class="btn btn-link text-decoration-none p-0 text-dark">
+            <a href="<%= request.getContextPath() %>/booking/details?id=<%= bookingIdParam %>" class="btn btn-link text-decoration-none p-0 text-dark">
                 &larr; Back to Booking Details
             </a>
         </div>
@@ -98,19 +46,15 @@
                                 <h6 class="text-muted small text-uppercase mb-3">Booking Summary</h6>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Booking ID:</span>
-                                    <span class="fw-semibold">#<%= bookingId %></span>
+                                    <span class="fw-semibold">#<%= bookingIdParam %></span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="text-muted">Service:</span>
                                     <span class="fw-semibold"><%= serviceName %></span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Date:</span>
-                                    <span class="fw-semibold"><%= bookingDate %></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted">Time:</span>
-                                    <span class="fw-semibold"><%= bookingTime %></span>
+                                    <span class="text-muted">Check-In Time:</span>
+                                    <span class="fw-semibold"><%= bookingTimestamp %></span>
                                 </div>
                                 <hr>
                                 <div class="d-flex justify-content-between">
@@ -120,10 +64,10 @@
                             </div>
 
                             <!-- Action Buttons -->
-                            <form action="CancelBookingServlet" method="post">
-                                <input type="hidden" name="bookingId" value="<%= bookingId %>">
+                            <form action="<%= request.getContextPath() %>/CancelBookingController" method="POST">
+                                <input type="hidden" name="bookingId" value="<%= bookingIdParam %>">
                                 <div class="d-flex gap-2 justify-content-center">
-                                    <a href="bookingDetails.jsp?id=<%= bookingId %>" class="btn btn-outline-secondary">Keep Booking</a>
+                                    <a href="<%= request.getContextPath() %>/booking/details?id=<%= bookingIdParam %>" class="btn btn-outline-secondary">Keep Booking</a>
                                     <button type="submit" class="btn btn-danger">
                                         <i class="bi bi-x-circle me-1"></i>Yes, Cancel Booking
                                     </button>

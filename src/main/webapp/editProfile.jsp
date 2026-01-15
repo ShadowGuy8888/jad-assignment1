@@ -1,49 +1,18 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
+<%@ page import="java.util.*" %>
 <%
-    String username = (String) session.getAttribute("username");
-    String userRole = (String) session.getAttribute("role");
-
-    if (username == null) {
-        response.sendRedirect("login.jsp?error=Please login to access this page");
-        return;
-    }
-
-    if ("admin".equals(userRole)) {
-        response.sendRedirect("admin.jsp");
-        return;
-    }
-
-    String userId = (String) session.getAttribute("userId");
-
-    // Variables to hold user info
-    String email = "", phone = "", createdAt = "", firstName = "", lastName = "", address = "", emergencyContact = "", blkNo = "", unitNo = "";
-
-    if (userId != null && !userId.equals("0")) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT * FROM user WHERE id = ?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, userId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        username = rs.getString("username"); // optional, overrides session
-                        email = rs.getString("email");
-                        phone = rs.getString("phone");
-                        createdAt = rs.getString("created_at"); // format as needed
-                        firstName = rs.getString("first_name");
-                        lastName = rs.getString("last_name");
-                        address = rs.getString("address");
-                        emergencyContact = rs.getString("emergency_contact");
-                        blkNo = rs.getString("blk_no");
-                        unitNo = rs.getString("unit_no");
-                      
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    String userId = (String) request.getAttribute("userId");
+    String username = (String) request.getAttribute("username");
+    String email = (String) request.getAttribute("email");
+    String phone = (String) request.getAttribute("phone");
+    String createdAt = (String) request.getAttribute("createdAt");
+    String firstName = (String) request.getAttribute("firstName");
+    String lastName = (String) request.getAttribute("lastName");
+    String address = (String) request.getAttribute("address");
+    String emergencyContact = (String) request.getAttribute("emergencyContact");
+    String blkNo = (String) request.getAttribute("blkNo");
+    String unitNo = (String) request.getAttribute("unitNo");
     
     String success = request.getParameter("success");
     String error = request.getParameter("error");
@@ -53,7 +22,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - Silver Care</title>
+    <title>Edit Profile</title>
     <%@ include file="designScripts.jsp" %>
 </head>
 <body class="bg-light">
@@ -67,9 +36,9 @@
                         <p class="text-secondary mb-0">Update your personal information</p>
                     </div>
                     <div class="col-auto">
-                        <a href="index.jsp" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                        </a>
+                            <a href="<%= request.getContextPath() %>/index.jsp" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Home
+                            </a>
                     </div>
                 </div>
             </div>
@@ -98,7 +67,7 @@
                             <h5 class="mb-0"><i class="bi bi-person-fill me-2"></i>Personal Information</h5>
                         </div>
                         <div class="card-body p-4">
-                            <form action="UpdateProfileServlet" method="post" id="editProfileForm">
+                            <form action="<%= request.getContextPath() %>/updateProfileController" method="POST" id="editProfileForm">
                                 <!-- Hidden user ID -->
                                 <input type="hidden" name="userId" value="<%= userId %>">
                                 
@@ -175,7 +144,7 @@
 
                                 <!-- Buttons -->
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="userDashboard.jsp" class="btn btn-outline-secondary">
+                                    <a href="<%= request.getContextPath() %>/index.jsp" class="btn btn-outline-secondary">
                                         <i class="bi bi-x-lg me-2"></i>Cancel
                                     </a>
                                     <button type="submit" class="btn btn-primary">
@@ -192,7 +161,7 @@
                             <h5 class="mb-0"><i class="bi bi-key-fill me-2"></i>Change Password</h5>
                         </div>
                         <div class="card-body p-4">
-                            <form action="ChangePasswordServlet" method="post" id="changePasswordForm">
+                            <form action="<%= request.getContextPath() %>/ChangePasswordController" method="post" id="changePasswordForm">
                                 <input type="hidden" name="userId" value="<%= userId %>">
                                 
                                 <div class="mb-3">
@@ -202,9 +171,7 @@
 
                                 <div class="mb-3">
                                     <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control" id="newPassword" name="newPassword" 
-                                           minlength="8" required>
-                                    <small class="text-muted">Minimum 8 characters</small>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
                                 </div>
 
                                 <div class="mb-4">
@@ -236,12 +203,6 @@
             if (newPassword !== confirmPassword) {
                 e.preventDefault();
                 alert('New passwords do not match!');
-                return false;
-            }
-            
-            if (newPassword.length < 8) {
-                e.preventDefault();
-                alert('Password must be at least 8 characters long!');
                 return false;
             }
         });

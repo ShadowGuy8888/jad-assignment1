@@ -1,3 +1,4 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -8,7 +9,7 @@
     <title>Login</title>
     <%@ include file="designScripts.jsp" %>
 </head>
-<% if (session.getAttribute("userRole") != null) response.sendRedirect("logout.jsp"); %>
+<% if (session.getAttribute("currentUser") != null) response.sendRedirect("logout.jsp"); %>
 <body>
 	<%@ include file="header.jsp" %>
 
@@ -38,7 +39,7 @@
 						    }
 						%>
                             
-                            <form action="/JAD-Assignment1/login" method="POST">
+                            <form action="<%= request.getContextPath() %>/login" method="POST">
                                 <div class="mb-3">
                                     <label for="usernameInput" class="form-label">Username</label>
                                     <input type="text" class="form-control" id="usernameInput" name="usernameInput" placeholder="yourUsername">

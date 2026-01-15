@@ -1,3 +1,4 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -7,7 +8,7 @@
 <title>Register</title>
 <%@ include file="designScripts.jsp" %>
 </head>
-<% if (session.getAttribute("userRole") != null) response.sendRedirect("logout.jsp"); %>
+<% if (session.getAttribute("currentUser") != null) response.sendRedirect("logout.jsp"); %>
 <body>
 	<%@ include file="header.jsp" %>
 	
@@ -28,7 +29,7 @@
                             <h2 class="h4 fw-bold mb-2">Register</h2>
                             <p class="text-secondary mb-4">Fill in your details to create an account</p>
                             
-                            <form action="/JAD-Assignment1/register" method="POST">
+                            <form action="<%= request.getContextPath() %>/register" method="POST">
                                 <!-- Required Fields Section -->
                                 <div class="mb-4">
                                     <h6 class="text-uppercase small text-secondary fw-bold mb-3">Required Information</h6>

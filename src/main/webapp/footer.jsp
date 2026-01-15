@@ -1,3 +1,4 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -22,16 +23,16 @@
                     <h3 class="h6 fw-semibold mb-3">Quick Links</h3>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <a href="index.jsp" class="text-decoration-none text-secondary small">Home</a>
+                            <a href="<%= request.getContextPath() %>/index.jsp" class="text-decoration-none text-secondary small">Home</a>
                         </li>
                         <li class="mb-2">
-                            <a href="services.jsp" class="text-decoration-none text-secondary small">Services</a>
+                            <a href="<%= request.getContextPath() %>/services" class="text-decoration-none text-secondary small">Services</a>
                         </li>
                         <li class="mb-2">
-                            <a href="register.jsp" class="text-decoration-none text-secondary small">Register</a>
+                            <a href="<%= request.getContextPath() %>/register.jsp" class="text-decoration-none text-secondary small">Register</a>
                         </li>
                         <li class="mb-2">
-                            <a href="login.jsp" class="text-decoration-none text-secondary small">Login</a>
+                            <a href="<%= request.getContextPath() %>/login.jsp" class="text-decoration-none text-secondary small">Login</a>
                         </li>
                     </ul>
                 </div>
@@ -52,7 +53,7 @@
                         <li class="mb-3">
                             <div class="d-flex align-items-start gap-2 text-secondary small">
                                 <i class="bi bi-telephone text-secondary"></i>
-                                <span>(555) 123-4567</span>
+                                <span>(65) 9788 0822</span>
                             </div>
                         </li>
                         <li class="mb-3">
@@ -64,7 +65,7 @@
                         <li class="mb-3">
                             <div class="d-flex align-items-start gap-2 text-secondary small">
                                 <i class="bi bi-geo-alt-fill text-secondary"></i>
-                                <span>123 Care Street, City, State 12345</span>
+                                <span>500 Dover Road, Singapore 139651</span>
                             </div>
                         </li>
                     </ul>

@@ -1,42 +1,13 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
+<%@ page import="java.util.*" %>
 <%
-    String role = (String) session.getAttribute("role");
-    if (role == null || !role.equals("ADMIN")) {
-        response.sendRedirect("login.jsp?error=Access denied");
-        return;
-    }
-
-    String clientId = request.getParameter("id");
-    if (clientId == null) {
-        response.sendRedirect("admin.jsp");
-        return;
-    }
-
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    String username = "", email = "", phone = "", firstName = "", lastName = "";
-
-    try {
-        conn = DatabaseConnection.getConnection();
-        ps = conn.prepareStatement("SELECT * FROM user WHERE id = ? AND role = 'USER'");
-        ps.setInt(1, Integer.parseInt(clientId));
-        rs = ps.executeQuery();
-
-        if (!rs.next()) {
-            response.sendRedirect("admin.jsp?error=Client not found");
-            return;
-        }
-
-        username = rs.getString("username");
-        email = rs.getString("email");
-        phone = rs.getString("phone");
-        firstName = rs.getString("first_name");
-        lastName = rs.getString("last_name");
-        rs.close(); ps.close();
-    } catch (Exception e) { e.printStackTrace(); }
+    String clientId = (String) request.getAttribute("clientId");
+    String username = (String) request.getAttribute("username");
+    String email = (String) request.getAttribute("email");
+    String phone = (String) request.getAttribute("phone");
+    String firstName = (String) request.getAttribute("firstName");
+    String lastName = (String) request.getAttribute("lastName");
 
     String error = request.getParameter("error");
 %>
@@ -45,13 +16,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Client - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <%@ include file="designScripts.jsp" %>
 </head>
 <body class="bg-light">
     <nav class="navbar bg-white border-bottom">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="admin.jsp"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+            <a class="navbar-brand fw-bold" href="<%= request.getContextPath() %>/admin/dashboard"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
         </div>
     </nav>
 
@@ -67,7 +37,7 @@
                         <div class="alert alert-danger"><%= error %></div>
                         <% } %>
 
-                        <form action="EditClientServlet" method="post">
+                        <form action="<%= request.getContextPath() %>/EditClientController" method="POST">
                             <input type="hidden" name="clientId" value="<%= clientId %>">
 
                             <div class="row mb-3">
@@ -87,8 +57,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Email *</label>
-                                <input type="email" class="form-control" name="email" value="<%= email %>" required>
+                                <label class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control" name="email" value="<%= email %>">
                             </div>
 
                             <div class="mb-3">
@@ -104,7 +74,7 @@
 
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
-                                <a href="admin.jsp" class="btn btn-outline-secondary">Cancel</a>
+                                <a href="<%= request.getContextPath() %>/admin/dashboard" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>
@@ -112,9 +82,5 @@
             </div>
         </div>
     </div>
-    <%
-        if (conn != null) conn.close();
-    %>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

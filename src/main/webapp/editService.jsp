@@ -1,56 +1,15 @@
+<!-- Author: Lau Chun Yi -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, java.util.*, com.jovanchunyi.util.DatabaseConnection" %>
+<%@ page import="java.util.*" %>
 <%
-    String role = (String) session.getAttribute("role");
-    if (role == null || !role.equals("ADMIN")) {
-        response.sendRedirect("login.jsp?error=Access denied");
-        return;
-    }
-
-    String serviceId = request.getParameter("id");
-    if (serviceId == null) {
-        response.sendRedirect("admin.jsp");
-        return;
-    }
-
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    String name = "", description = "", imageUrl = "";
-    int categoryId = 0, hourlyRate = 0;
-    List<Integer> selectedQuals = new ArrayList<>();
-
-    try {
-        conn = DatabaseConnection.getConnection();
-        
-        // Get service details
-        ps = conn.prepareStatement("SELECT * FROM service WHERE id = ?");
-        ps.setInt(1, Integer.parseInt(serviceId));
-        rs = ps.executeQuery();
-
-        if (!rs.next()) {
-            response.sendRedirect("admin.jsp?error=Service not found");
-            return;
-        }
-
-        name = rs.getString("name");
-        description = rs.getString("description");
-        categoryId = rs.getInt("category_id");
-        hourlyRate = rs.getInt("hourly_rate");
-        imageUrl = rs.getString("image_url");
-        rs.close(); ps.close();
-
-        // Get existing qualifications for this service
-        ps = conn.prepareStatement("SELECT caregiver_qualification_id FROM service_caregiver_qualification WHERE service_id = ?");
-        ps.setInt(1, Integer.parseInt(serviceId));
-        rs = ps.executeQuery();
-        while (rs.next()) {
-            selectedQuals.add(rs.getInt("caregiver_qualification_id"));
-        }
-        rs.close(); ps.close();
-    } catch (Exception e) { e.printStackTrace(); }
-
+    String serviceId = (String) request.getAttribute("serviceId");
+    String name = (String) request.getAttribute("name");
+    String description = (String) request.getAttribute("description");
+    Integer categoryId = (Integer) request.getAttribute("categoryId");
+    Integer hourlyRate = (Integer) request.getAttribute("hourlyRate");
+    String imageUrl = (String) request.getAttribute("imageUrl");
+    List<Integer> selectedQuals = (List<Integer>) request.getAttribute("selectedQuals");
+    if (selectedQuals == null) selectedQuals = new ArrayList<>();
     String error = request.getParameter("error");
 %>
 <!DOCTYPE html>
@@ -58,13 +17,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Service - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <%@ include file="designScripts.jsp" %>
 </head>
 <body class="bg-light">
     <nav class="navbar bg-white border-bottom">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="admin.jsp"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
+            <a class="navbar-brand fw-bold" href="<%= request.getContextPath() %>/admin/dashboard"><i class="bi bi-arrow-left me-2"></i>Back to Dashboard</a>
         </div>
     </nav>
 
@@ -80,7 +38,7 @@
                         <div class="alert alert-danger"><%= error %></div>
                         <% } %>
 
-                        <form action="EditServiceServlet" method="post">
+                        <form action="<%= request.getContextPath() %>/EditServiceController" method="post">
                             <input type="hidden" name="serviceId" value="<%= serviceId %>">
 
                             <div class="mb-3">
@@ -92,17 +50,15 @@
                                 <label class="form-label fw-semibold">Category *</label>
                                 <select class="form-select" name="categoryId" required>
                                     <%
-                                        try {
-                                            ps = conn.prepareStatement("SELECT id, name FROM service_category ORDER BY name");
-                                            rs = ps.executeQuery();
-                                            while (rs.next()) {
-                                                int catId = rs.getInt("id");
+                                        List<Map<String, Object>> categories = (List<Map<String, Object>>) request.getAttribute("categories");
+                                        if (categories != null) {
+                                            for (Map<String, Object> row : categories) {
+                                                int catId = (Integer) row.get("id");
                                     %>
-                                    <option value="<%= catId %>" <%= catId == categoryId ? "selected" : "" %>><%= rs.getString("name") %></option>
+                                    <option value="<%= catId %>" <%= catId == categoryId ? "selected" : "" %>><%= row.get("name") %></option>
                                     <%
                                             }
-                                            rs.close(); ps.close();
-                                        } catch (Exception e) { e.printStackTrace(); }
+                                        }
                                     %>
                                 </select>
                             </div>
@@ -128,28 +84,26 @@
                                 <small class="text-muted d-block mb-2">Select required qualifications for this service</small>
                                 <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
                                     <%
-                                        try {
-                                            ps = conn.prepareStatement("SELECT qualification_id, name FROM caregiver_qualification ORDER BY name");
-                                            rs = ps.executeQuery();
-                                            while (rs.next()) {
-                                                int qualId = rs.getInt("qualification_id");
+                                        List<Map<String, Object>> qualifications = (List<Map<String, Object>>) request.getAttribute("qualifications");
+                                        if (qualifications != null) {
+                                            for (Map<String, Object> row : qualifications) {
+                                                int qualId = (Integer) row.get("id");
                                                 boolean isSelected = selectedQuals.contains(qualId);
                                     %>
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="checkbox" name="qualifications" value="<%= qualId %>" id="qual_<%= qualId %>" <%= isSelected ? "checked" : "" %>>
-                                        <label class="form-check-label" for="qual_<%= qualId %>"><%= rs.getString("name") %></label>
+                                        <label class="form-check-label" for="qual_<%= qualId %>"><%= row.get("name") %></label>
                                     </div>
                                     <%
                                             }
-                                            rs.close(); ps.close();
-                                        } catch (Exception e) { e.printStackTrace(); }
+                                        }
                                     %>
                                 </div>
                             </div>
 
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Save Changes</button>
-                                <a href="admin.jsp" class="btn btn-outline-secondary">Cancel</a>
+                                <a href="<%= request.getContextPath() %>/admin/dashboard" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>
@@ -157,9 +111,8 @@
             </div>
         </div>
     </div>
-    <%
-        if (conn != null) conn.close();
-    %>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // This page should be accessed via /admin/service/edit servlet
+    </script>
 </body>
 </html>

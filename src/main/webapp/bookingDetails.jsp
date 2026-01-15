@@ -1,73 +1,11 @@
+<!-- Author: Jovan Yap Keat An -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.sql.*, com.jovanchunyi.util.DatabaseConnection" %>
-<%
-    // Access control
-    String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
-        response.sendRedirect("login.jsp?error=Please login first");
-        return;
-    }
-
-    String bookingIdParam = request.getParameter("id");
-    if (bookingIdParam == null || !bookingIdParam.matches("\\d+")) {
-        response.sendRedirect("myBookings.jsp?error=Invalid booking ID");
-        return;
-    }
-    int bookingId = Integer.parseInt(bookingIdParam);
-
-    // DB variables
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    String serviceName = "", status = "", notes = "", categoryName = "";
-    int duration = 0;
-    double totalPrice = 0, hourlyRate = 0;
-    Date bookingDate = null;
-    Time bookingTime = null;
-
-    try {
-        conn = DatabaseConnection.getConnection();
-        String sql = "SELECT b.*, s.name AS service_name, s.hourly_rate, c.name AS category_name " +
-                     "FROM booking b " +
-                     "JOIN service s ON b.service_id = s.id " +
-                     "JOIN service_category c ON s.category_id = c.id " +
-                     "WHERE b.id = ? AND b.user_id = ?";
-        ps = conn.prepareStatement(sql);
-        ps.setInt(1, bookingId);
-        ps.setString(2, userId);
-        rs = ps.executeQuery();
-
-        if (!rs.next()) {
-            response.sendRedirect("myBookings.jsp?error=Booking not found");
-            return;
-        }
-
-        serviceName = rs.getString("service_name");
-        categoryName = rs.getString("category_name");
-        hourlyRate = rs.getDouble("hourly_rate");
-        duration = rs.getInt("duration_hours");
-        totalPrice = rs.getDouble("total_price");
-        bookingDate = rs.getDate("booking_date");
-        bookingTime = rs.getTime("booking_time");
-        status = rs.getString("status");
-        notes = rs.getString("notes");
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        if(rs != null) rs.close();
-        if(ps != null) ps.close();
-        if(conn != null) conn.close();
-    }
-
-    String statusClass = status != null ? status.toLowerCase() : "pending";
-%>
-
+<%@ page import="java.sql.Timestamp" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Booking Details - Silver Care</title>
+    <title>Booking Details</title>
     <%@ include file="designScripts.jsp" %>
     <style>
         .status-badge { padding: 0.35rem 0.85rem; border-radius: 50px; font-size: 0.875rem; font-weight: 500; }
@@ -79,13 +17,32 @@
         .detail-value { font-weight: 500; }
     </style>
 </head>
+<%
+    String bookingIdParam = (String) request.getAttribute("bookingId");
+    String serviceName = (String) request.getAttribute("serviceName");
+    String categoryName = (String) request.getAttribute("categoryName");
+    String hourlyRateStr = (String) request.getAttribute("hourlyRate");
+    String durationStr = (String) request.getAttribute("durationHours");
+    String totalPriceStr = (String) request.getAttribute("totalPrice");
+    Timestamp bookingTimestamp = (Timestamp) request.getAttribute("checkInTime");
+    String status = (String) request.getAttribute("status");
+    String notes = (String) request.getAttribute("notes");
+    int duration = 0;
+    double hourlyRate = 0.0;
+    double totalPrice = 0.0;
+    try {
+        if (durationStr != null) duration = Integer.parseInt(durationStr);
+        if (hourlyRateStr != null) hourlyRate = Double.parseDouble(hourlyRateStr);
+        if (totalPriceStr != null) totalPrice = Double.parseDouble(totalPriceStr);
+    } catch (Exception ignored) {}
+    String statusClass = status != null ? status.toLowerCase() : "pending";
+%>
 <body>
 <%@ include file="header.jsp" %>
-
 <main>
     <section class="bg-light py-3 border-bottom">
         <div class="container">
-            <a href="myBooking.jsp" class="btn btn-link text-decoration-none p-0 text-dark">
+            <a href="<%= request.getContextPath() %>/myBookings" class="btn btn-link text-decoration-none p-0 text-dark">
                 &larr; Back to My Bookings
             </a>
         </div>
@@ -100,7 +57,7 @@
                         <div>
                             <span class="badge bg-primary mb-2"><%= categoryName %></span>
                             <h1 class="h3 mb-2"><%= serviceName %></h1>
-                            <span class="text-muted">Booking #<%= bookingId %></span>
+                            <span class="text-muted">Booking #<%= bookingIdParam %></span>
                         </div>
                         <span class="status-badge status-<%= statusClass %>"><%= status %></span>
                     </div>
@@ -113,12 +70,8 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <p class="detail-label">Date</p>
-                                    <p class="detail-value mb-0"><%= bookingDate %></p>
-                                </div>
-                                <div class="col-md-4">
-                                    <p class="detail-label">Time</p>
-                                    <p class="detail-value mb-0"><%= bookingTime %></p>
+                                    <p class="detail-label">Check-In Time</p>
+                                    <p class="detail-value mb-0"><%= bookingTimestamp %></p>
                                 </div>
                                 <div class="col-md-4">
                                     <p class="detail-label">Duration</p>
@@ -163,11 +116,13 @@
 
                         <!-- Actions -->
                         <div class="card-body d-grid gap-2">
-                            <% if (statusClass.equals("pending") || statusClass.equals("confirmed")) { %>
-                            <a href="editBooking.jsp?id=<%= bookingId %>" class="btn btn-outline-primary">Edit Booking</a>
-                            <a href="cancelBooking.jsp?id=<%= bookingId %>" class="btn btn-outline-danger">Cancel Booking</a>
+                            <% if (statusClass.equals("pending")) { %>
+                            <a href="<%= request.getContextPath() %>/booking/edit?id=<%= bookingIdParam %>" class="btn btn-outline-primary">Edit Booking</a>
+                            <form method="post" action="<%= request.getContextPath() %>/booking/details?id=<%= bookingIdParam %>">
+                                <button type="submit" class="btn btn-outline-danger w-100">Remove from Cart</button>
+                            </form>
                             <% } %>
-                            <a href="myBooking.jsp" class="btn btn-secondary">Back to Bookings</a>
+                            <a href="<%= request.getContextPath() %>/myBookings" class="btn btn-secondary">Back to Bookings</a>
                         </div>
                     </div>
                 </div>

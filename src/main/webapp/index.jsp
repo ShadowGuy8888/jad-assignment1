@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-
+<!-- Author: Jovan Yap Keat An -->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,14 +69,14 @@
                         <h1 class="display-4 fw-bold mb-4">Compassionate Care for Your Loved Ones</h1>
                         <p class="lead text-secondary mb-4">Professional in-home care services, assisted living support, and specialized care to help seniors live with dignity and independence</p>
                         <div class="d-flex flex-wrap gap-3 justify-content-center">
-                            <button class="btn btn-dark btn-lg px-4" onclick="location.href = 'services.jsp'">
+                            <button class="btn btn-dark btn-lg px-4" onclick="location.href = '<%= request.getContextPath() %>/services?categoryName=all'">
                                 Explore Our Services
                                 <i class="bi bi-arrow-right text-light"></i>
                             </button>
-                            <% if (session.getAttribute("userRole") == null) { %>
-                            	<button class="btn btn-outline-dark btn-lg px-4" onclick="location.href = 'register.jsp'">
-                            		Get Started Today
-                            	</button>
+                            <% if (session.getAttribute("currentUser") == null) { %>
+                            	<button class="btn btn-outline-dark btn-lg px-4" onclick="location.href = '<%= request.getContextPath() %>/register.jsp'">
+                             		Get Started Today
+                             	</button>
                             <% } %>
                         </div>
                     </div>
@@ -154,7 +153,7 @@
                                 </div>
                                 <h5 class="mb-2">In-Home Care</h5>
                                 <p class="text-secondary mb-3">Compassionate care in the comfort of your own home</p>
-                                <a href="#" class="text-primary text-decoration-none fw-semibold">
+                                <a href="<%= request.getContextPath() %>/services?categoryName=In-Home%20Care" class="text-primary text-decoration-none fw-semibold">
                                     View Services 
                                     <i class="bi bi-arrow-right text-primary"></i>
                                 </a>
@@ -169,7 +168,7 @@
                                 </div>
                                 <h5 class="mb-2">Assisted Living Support</h5>
                                 <p class="text-secondary mb-3">Support services for assisted living residents</p>
-                                <a href="#" class="text-primary text-decoration-none fw-semibold">
+                                <a href="<%= request.getContextPath() %>/services?categoryName=Assisted%20Living%20Support" class="text-primary text-decoration-none fw-semibold">
                                     View Services 
                                     <i class="bi bi-arrow-right text-primary"></i>
                                 </a>
@@ -184,7 +183,7 @@
                                 </div>
                                 <h5 class="mb-2">Specialized Care</h5>
                                 <p class="text-secondary mb-3">Expert care for specific health conditions</p>
-                                <a href="#" class="text-primary text-decoration-none fw-semibold">
+                                <a href="<%= request.getContextPath() %>/services?categoryName=Specialized%20Care" class="text-primary text-decoration-none fw-semibold">
                                     View Services 
                                     <i class="bi bi-arrow-right text-primary"></i>
                                 </a>
@@ -199,7 +198,7 @@
                                 </div>
                                 <h5 class="mb-2">Additional Services</h5>
                                 <p class="text-secondary mb-3">Transportation, meal delivery, and more</p>
-                                <a href="#" class="text-primary text-decoration-none fw-semibold">
+                                <a href="<%= request.getContextPath() %>/services?categoryName=Additional%20Services" class="text-primary text-decoration-none fw-semibold">
                                     View Services 
                                     <i class="bi bi-arrow-right text-primary"></i>
                                 </a>
@@ -227,7 +226,7 @@
                                 </div>
                                 <p class="fst-italic text-secondary mb-3">"The caregivers at Silver Care have been wonderful with my mother. They treat her with such respect and kindness."</p>
                                 <div>
-                                    <p class="mb-0 fw-semibold">Margaret Thompson</p>
+                                    <p class="mb-0 fw-semibold">Susan Tay</p>
                                     <p class="small text-secondary mb-0">Daughter of Client</p>
                                 </div>
                             </div>
@@ -263,7 +262,7 @@
                                 </div>
                                 <p class="fst-italic text-secondary mb-3">"After my surgery, their post-operative care services helped me recover comfortably at home. Highly recommended!"</p>
                                 <div>
-                                    <p class="mb-0 fw-semibold">Susan Williams</p>
+                                    <p class="mb-0 fw-semibold">Freya Wong</p>
                                     <p class="small text-secondary mb-0">Client</p>
                                 </div>
                             </div>
